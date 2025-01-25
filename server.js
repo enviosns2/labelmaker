@@ -35,7 +35,7 @@ mongoose
   });
 
 // Esquema y modelo de MongoDB
-const PackageSchema = new mongoose.Schema({
+const EstadoSchema = new mongoose.Schema({
   paquete_id: { type: String, required: true },
   estado_actual: { type: String, default: "Recibido" },
   historial: [
@@ -53,7 +53,9 @@ const PackageSchema = new mongoose.Schema({
   quantity: { type: Number, required: true },
   createdAt: { type: Date, default: Date.now },
 });
-const Package = mongoose.model("Package", PackageSchema);
+
+// Ajustar el modelo para usar la colección "estados"
+const Estado = mongoose.model("Estado", EstadoSchema, "estados");
 
 // Rutas de la API
 app.get("/api", (req, res) => res.send("API funcionando correctamente"));
@@ -67,16 +69,16 @@ app.post("/api/packages", async (req, res) => {
       return res.status(400).json({ error: "El uniqueCode es obligatorio." });
     }
 
-    const newPackage = new Package({
+    const newEstado = new Estado({
       paquete_id: uniqueCode,
       estado_actual: "Recibido",
       historial: [{ estado: "Recibido", fecha: new Date() }],
       ...rest,
     });
 
-    const savedPackage = await newPackage.save();
-    console.log("Paquete guardado exitosamente:", savedPackage);
-    res.status(201).json(savedPackage);
+    const savedEstado = await newEstado.save();
+    console.log("Paquete guardado exitosamente:", savedEstado);
+    res.status(201).json(savedEstado);
   } catch (err) {
     console.error("Error al crear paquete:", err.message);
     res.status(500).json({ error: "Error al guardar el paquete" });
