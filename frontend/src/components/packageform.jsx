@@ -11,16 +11,15 @@ const PackageForm = ({ onGenerateLabel }) => {
     dimensions: "",
     customDimensions: "",
     weight: "",
-    quantity: "", // Campo para cantidad
+    quantity: "",
   });
 
   // URL del backend desplegado en Render
   const API_URL =
-  process.env.NODE_ENV === "production"
-    ? "/api/packages"
-    : "https://labelmaker.onrender.com";
+    process.env.NODE_ENV === "production"
+      ? "https://labelmaker.onrender.com/api/packages"
+      : "http://localhost:3000/api/packages";
 
-  // Maneja los cambios en los campos del formulario
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -28,20 +27,18 @@ const PackageForm = ({ onGenerateLabel }) => {
     });
   };
 
-  // Genera un código único basado en los datos del formulario
   const generateUniqueCode = (data) => {
-    const timestamp = Date.now().toString(36); // Marca de tiempo en base 36
-    const clientPrefix = data.sender.slice(0, 3).toUpperCase(); // Primeras 3 letras del remitente
+    const timestamp = Date.now().toString(36);
+    const clientPrefix = data.sender.slice(0, 3).toUpperCase();
     const cityPrefix =
       data.city === "otro"
-        ? data.customCity.slice(0, 3).toUpperCase() // Ciudad personalizada
-        : data.city.slice(0, 3).toUpperCase(); // Ciudad seleccionada
-    const randomString = Math.random().toString(36).substring(2, 6).toUpperCase(); // Cadena aleatoria
+        ? data.customCity.slice(0, 3).toUpperCase()
+        : data.city.slice(0, 3).toUpperCase();
+    const randomString = Math.random().toString(36).substring(2, 6).toUpperCase();
 
     return `${clientPrefix}-${cityPrefix}-${timestamp}-${randomString}`;
   };
 
-  // Limpia los datos del formulario
   const resetForm = () => {
     setFormData({
       sender: "",
@@ -56,7 +53,6 @@ const PackageForm = ({ onGenerateLabel }) => {
     });
   };
 
-  // Validación de campos obligatorios
   const isFormValid = () => {
     const {
       sender,
@@ -81,7 +77,6 @@ const PackageForm = ({ onGenerateLabel }) => {
     );
   };
 
-  // Maneja el envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -92,7 +87,6 @@ const PackageForm = ({ onGenerateLabel }) => {
 
     const uniqueCode = generateUniqueCode(formData);
 
-    // Construir el paquete con los datos del formulario
     const packageData = {
       paquete_id: uniqueCode,
       uniqueCode,
@@ -108,10 +102,8 @@ const PackageForm = ({ onGenerateLabel }) => {
       quantity: formData.quantity,
     };
 
-    // Mostrar la etiqueta en el frontend
     onGenerateLabel(packageData);
 
-    // Enviar los datos al backend
     try {
       const response = await axios.post(API_URL, packageData);
       console.log("Paquete guardado en la base de datos:", response.data);
@@ -130,7 +122,6 @@ const PackageForm = ({ onGenerateLabel }) => {
       onSubmit={handleSubmit}
       style={{ display: "flex", flexDirection: "column", gap: "10px" }}
     >
-      {/* Campos del formulario */}
       <div>
         <label>
           Remitente:
@@ -212,12 +203,6 @@ const PackageForm = ({ onGenerateLabel }) => {
             <option value="16x16x16">16x16x16</option>
             <option value="18x18x18">18x18x18</option>
             <option value="20x20x20">20x20x20</option>
-            <option value="18x18x27">18x18x27</option>
-            <option value="22x22x22">22x22x22</option>
-            <option value="24x24x24">24x24x24</option>
-            <option value="24x24x30">24x24x30</option>
-            <option value="27x27x27">27x27x27</option>
-            <option value="30x30x30">30x30x30</option>
             <option value="otro">Otro</option>
           </select>
         </label>
