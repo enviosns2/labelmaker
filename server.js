@@ -1,53 +1,35 @@
 const path = require("path");
-const fs = require("fs");
-require("dotenv").config();
-
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+require("dotenv").config();
 
 const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 
-if (!PORT) {
-  console.error("Error: La variable de entorno PORT no está configurada.");
+// Verificar variables de entorno
+if (!process.env.MONGO_URI) {
+  console.error("Error: La variable de entorno MONGO_URI no está configurada.");
   process.exit(1);
 }
 
-// Logs para verificar las variables de entorno
-console.log("Cargando variables de entorno desde .env...");
-console.log("MONGO_URI:", process.env.MONGO_URI || "No configurada");
-console.log("PORT:", PORT);
-console.log("NODE_ENV:", process.env.NODE_ENV || "No configurado");
+console.log("Cargando variables de entorno...");
+console.log("MONGO_URI:", process.env.MONGO_URI);
+console.log("NODE_ENV:", process.env.NODE_ENV || "development");
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Log de todas las solicitudes entrantes
-app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
-  next();
-});
-
-// Configuración de Mongoose
-mongoose.set("strictQuery", true);
-
-const connectToDatabase = async () => {
-  try {
-    await mongoose.connect(process.env.MONGO_URI); // Simplificación
-    console.log("Conexión exitosa a MongoDB");
-  } catch (err) {
+// Conexión a MongoDB
+mongoose
+  .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log("Conexión exitosa a MongoDB"))
+  .catch((err) => {
     console.error("Error al conectar con MongoDB:", err.message);
     process.exit(1);
-  }
-};
-connectToDatabase();
-
-mongoose.connection.on("connected", () => console.log("Conexión a MongoDB establecida."));
-mongoose.connection.on("error", (err) => console.error("Error en la conexión a MongoDB:", err.message));
-mongoose.connection.on("disconnected", () => console.log("Desconectado de MongoDB."));
+  });
 
 // Esquema y modelo de MongoDB
 const PackageSchema = new mongoose.Schema({
@@ -65,18 +47,13 @@ const PackageSchema = new mongoose.Schema({
   quantity: { type: Number, required: true },
   createdAt: { type: Date, default: Date.now },
 });
-const Package = mongoose.model("Estado", PackageSchema, "estados");
+const Package = mongoose.model("Package", PackageSchema);
 
 // Rutas de la API
-app.get("/api", (req, res) => {
-  console.log("Solicitud GET a /api");
-  res.send("API funcionando correctamente");
-});
+app.get("/api", (req, res) => res.send("API funcionando correctamente"));
 
 app.post("/api/packages", async (req, res) => {
   try {
-    console.log("Datos recibidos para crear paquete:", req.body);
-
     const { uniqueCode, ...rest } = req.body;
     if (!uniqueCode) return res.status(400).json({ error: "El uniqueCode es obligatorio." });
 
@@ -88,7 +65,6 @@ app.post("/api/packages", async (req, res) => {
     });
 
     const savedPackage = await newPackage.save();
-    console.log("Paquete creado exitosamente:", savedPackage);
     res.status(201).json(savedPackage);
   } catch (err) {
     console.error("Error al crear paquete:", err.message);
@@ -98,52 +74,24 @@ app.post("/api/packages", async (req, res) => {
 
 // Ruta de verificación de salud
 app.get("/healthz", (req, res) => {
-  console.log("Solicitud GET a /healthz");
-  const healthStatus = {
-    status: "ok",
-    timestamp: new Date(),
-    uptime: process.uptime(),
-    memoryUsage: process.memoryUsage(),
-    database: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
-  };
-  res.status(200).json(healthStatus);
+  res.status(200).json({ status: "ok", timestamp: Date.now() });
 });
 
-// Configuración del frontend en producción
+// Configuración del frontend
 if (process.env.NODE_ENV === "production") {
-  console.log("Modo producción: Sirviendo archivos estáticos del frontend");
   const staticPath = path.join(__dirname, "dist");
   app.use(express.static(staticPath));
 
   app.get("*", (req, res) => {
-    const indexPath = path.resolve(staticPath, "index.html");
-    fs.access(indexPath, fs.constants.F_OK, (err) => {
+    res.sendFile(path.resolve(staticPath, "index.html"), (err) => {
       if (err) {
-        console.error("Archivo index.html no encontrado:", err.message);
-        return res.status(404).send("Archivo no encontrado");
+        res.status(500).send("Error al servir el archivo estático.");
       }
-      res.sendFile(indexPath);
     });
   });
 } else {
-  console.log("Modo desarrollo: API lista para usarse");
   app.get("/", (req, res) => res.send("Servidor en desarrollo"));
 }
 
-// Manejadores de excepciones y promesas no controladas
-process.on("uncaughtException", (err) => {
-  console.error("Excepción no controlada:", err.stack || err.message);
-});
-
-process.on("unhandledRejection", (reason) => {
-  console.error("Promesa no manejada:", reason);
-});
-
-// Inicio del servidor
-app.listen(PORT, (err) => {
-  if (err) {
-    console.error("Error al iniciar el servidor:", err.message);
-  } else {
-    console.log(`Servidor corriendo en el puerto ${PORT}`);
-  }
-});
+// Iniciar el servidor
+app.listen(PORT, () => console.log(`Servidor corriendo en el puerto ${PORT}`));
