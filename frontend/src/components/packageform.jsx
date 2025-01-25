@@ -14,6 +14,9 @@ const PackageForm = ({ onGenerateLabel }) => {
     quantity: "",
   });
 
+  const [statusMessage, setStatusMessage] = useState(""); // Mensajes de estado
+  const [isSubmitting, setIsSubmitting] = useState(false); // Estado de envío
+
   // URL del backend desplegado en Render
   const API_URL =
     process.env.NODE_ENV === "production"
@@ -51,6 +54,7 @@ const PackageForm = ({ onGenerateLabel }) => {
       weight: "",
       quantity: "",
     });
+    setStatusMessage(""); // Limpia el mensaje de estado
   };
 
   const isFormValid = () => {
@@ -81,7 +85,7 @@ const PackageForm = ({ onGenerateLabel }) => {
     e.preventDefault();
 
     if (!isFormValid()) {
-      alert("Por favor, completa todos los campos.");
+      setStatusMessage("Por favor, completa todos los campos obligatorios.");
       return;
     }
 
@@ -102,18 +106,19 @@ const PackageForm = ({ onGenerateLabel }) => {
       quantity: formData.quantity,
     };
 
-    onGenerateLabel(packageData);
+    setStatusMessage("Enviando datos...");
+    setIsSubmitting(true);
 
     try {
       const response = await axios.post(API_URL, packageData);
-      console.log("Paquete guardado en la base de datos:", response.data);
-      alert("Paquete guardado con éxito.");
+      console.log("Respuesta del servidor:", response.data);
+      setStatusMessage("Paquete guardado con éxito.");
       resetForm();
     } catch (error) {
-      console.error("Error al guardar el paquete:", error);
-      alert(
-        "Hubo un error al intentar guardar el paquete. Por favor, intenta nuevamente."
-      );
+      console.error("Error al guardar el paquete:", error.response || error.message);
+      setStatusMessage("Error al guardar el paquete. Intenta nuevamente.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -202,7 +207,6 @@ const PackageForm = ({ onGenerateLabel }) => {
             <option value="14x14x14">14x14x14</option>
             <option value="16x16x16">16x16x16</option>
             <option value="18x18x18">18x18x18</option>
-            <option value="20x20x20">20x20x20</option>
             <option value="otro">Otro</option>
           </select>
         </label>
@@ -244,9 +248,11 @@ const PackageForm = ({ onGenerateLabel }) => {
           />
         </label>
       </div>
-      <button type="submit" style={{ marginTop: "10px" }}>
-        Generar Etiqueta
+      <button type="submit" style={{ marginTop: "10px" }} disabled={isSubmitting}>
+        {isSubmitting ? "Enviando..." : "Generar Etiqueta"}
       </button>
+      {/* Mostrar mensajes de estado */}
+      {statusMessage && <p>{statusMessage}</p>}
     </form>
   );
 };

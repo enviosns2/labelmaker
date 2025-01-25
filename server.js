@@ -1,97 +1,261 @@
-const path = require("path");
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-require("dotenv").config();
+import React, { useState } from "react";
+import axios from "axios";
 
-const app = express();
-const PORT = process.env.PORT || 3000;
-
-// Verificar variables de entorno
-if (!process.env.MONGO_URI) {
-  console.error("Error: La variable de entorno MONGO_URI no está configurada.");
-  process.exit(1);
-}
-
-console.log("Cargando variables de entorno...");
-console.log("MONGO_URI:", process.env.MONGO_URI);
-console.log("NODE_ENV:", process.env.NODE_ENV || "development");
-
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// Conexión a MongoDB
-mongoose
-  .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("Conexión exitosa a MongoDB"))
-  .catch((err) => {
-    console.error("Error al conectar con MongoDB:", err.message);
-    process.exit(1);
+const PackageForm = ({ onGenerateLabel }) => {
+  const [formData, setFormData] = useState({
+    sender: "",
+    street: "",
+    postalCode: "",
+    city: "",
+    customCity: "",
+    dimensions: "",
+    customDimensions: "",
+    weight: "",
+    quantity: "",
   });
 
-// Esquema y modelo de MongoDB
-const PackageSchema = new mongoose.Schema({
-  paquete_id: { type: String, required: true },
-  estado_actual: { type: String, default: "Recibido" },
-  historial: [
-    { estado: { type: String, required: true }, fecha: { type: Date, default: Date.now } },
-  ],
-  sender: { type: String, required: true },
-  street: { type: String, required: true },
-  postalCode: { type: String, required: true },
-  city: { type: String, required: true },
-  dimensions: { type: String, required: true },
-  weight: { type: String, required: true },
-  quantity: { type: Number, required: true },
-  createdAt: { type: Date, default: Date.now },
-});
-const Package = mongoose.model("Package", PackageSchema);
+  const [isLoading, setIsLoading] = useState(false); // Indicador de carga
+  const [errorMessage, setErrorMessage] = useState(""); // Mensaje de error
 
-// Rutas de la API
-app.get("/api", (req, res) => res.send("API funcionando correctamente"));
+  // URL del backend desplegado
+  const API_URL = "https://labelmaker.onrender.com/api/packages";
 
-app.post("/api/packages", async (req, res) => {
-  try {
-    const { uniqueCode, ...rest } = req.body;
-    if (!uniqueCode) return res.status(400).json({ error: "El uniqueCode es obligatorio." });
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+    setErrorMessage(""); // Limpia el mensaje de error al escribir
+  };
 
-    const newPackage = new Package({
+  const generateUniqueCode = (data) => {
+    const timestamp = Date.now().toString(36);
+    const clientPrefix = data.sender.slice(0, 3).toUpperCase();
+    const cityPrefix =
+      data.city === "otro"
+        ? data.customCity.slice(0, 3).toUpperCase()
+        : data.city.slice(0, 3).toUpperCase();
+    const randomString = Math.random().toString(36).substring(2, 6).toUpperCase();
+
+    return `${clientPrefix}-${cityPrefix}-${timestamp}-${randomString}`;
+  };
+
+  const isFormValid = () => {
+    const {
+      sender,
+      street,
+      postalCode,
+      city,
+      customCity,
+      dimensions,
+      customDimensions,
+      weight,
+      quantity,
+    } = formData;
+
+    return (
+      sender &&
+      street &&
+      postalCode &&
+      weight &&
+      quantity &&
+      (city !== "otro" || customCity) &&
+      (dimensions !== "otro" || customDimensions)
+    );
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!isFormValid()) {
+      setErrorMessage("Por favor, completa todos los campos obligatorios.");
+      return;
+    }
+
+    const uniqueCode = generateUniqueCode(formData);
+
+    const packageData = {
       paquete_id: uniqueCode,
-      estado_actual: "Recibido",
-      historial: [{ estado: "Recibido", fecha: new Date() }],
-      ...rest,
-    });
+      uniqueCode,
+      sender: formData.sender,
+      street: formData.street,
+      postalCode: formData.postalCode,
+      city: formData.city === "otro" ? formData.customCity : formData.city,
+      dimensions:
+        formData.dimensions === "otro"
+          ? formData.customDimensions
+          : formData.dimensions,
+      weight: formData.weight,
+      quantity: formData.quantity,
+    };
 
-    const savedPackage = await newPackage.save();
-    res.status(201).json(savedPackage);
-  } catch (err) {
-    console.error("Error al crear paquete:", err.message);
-    res.status(500).json({ error: "Error al guardar el paquete" });
-  }
-});
+    console.log("[DEBUG] Enviando datos al backend:", packageData);
+    setIsLoading(true);
 
-// Ruta de verificación de salud
-app.get("/healthz", (req, res) => {
-  res.status(200).json({ status: "ok", timestamp: Date.now() });
-});
+    try {
+      const response = await axios.post(API_URL, packageData);
+      console.log("[DEBUG] Respuesta del backend:", response.data);
 
-// Configuración del frontend
-if (process.env.NODE_ENV === "production") {
-  const staticPath = path.join(__dirname, "dist");
-  app.use(express.static(staticPath));
+      alert("Paquete guardado con éxito.");
+      onGenerateLabel(packageData); // Mostrar en el frontend
+      setFormData({
+        sender: "",
+        street: "",
+        postalCode: "",
+        city: "",
+        customCity: "",
+        dimensions: "",
+        customDimensions: "",
+        weight: "",
+        quantity: "",
+      });
+    } catch (error) {
+      console.error("[DEBUG] Error en la solicitud POST:", error.response || error.message);
+      setErrorMessage(
+        "Hubo un error al guardar el paquete. Por favor, revisa la consola para más detalles."
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  app.get("*", (req, res) => {
-    res.sendFile(path.resolve(staticPath, "index.html"), (err) => {
-      if (err) {
-        res.status(500).send("Error al servir el archivo estático.");
-      }
-    });
-  });
-} else {
-  app.get("/", (req, res) => res.send("Servidor en desarrollo"));
-}
+  return (
+    <form
+      onSubmit={handleSubmit}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "10px",
+        maxWidth: "400px",
+        margin: "0 auto",
+      }}
+    >
+      <h2>Generar Etiqueta</h2>
+      {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+      <div>
+        <label>
+          Remitente:
+          <input
+            type="text"
+            name="sender"
+            value={formData.sender}
+            onChange={handleChange}
+            placeholder="Nombre del remitente"
+            required
+          />
+        </label>
+      </div>
+      <div>
+        <label>
+          Calle y número:
+          <input
+            type="text"
+            name="street"
+            value={formData.street}
+            onChange={handleChange}
+            placeholder="Calle y número"
+            required
+          />
+        </label>
+      </div>
+      <div>
+        <label>
+          Código postal:
+          <input
+            type="text"
+            name="postalCode"
+            value={formData.postalCode}
+            onChange={handleChange}
+            placeholder="Código postal"
+            required
+          />
+        </label>
+      </div>
+      <div>
+        <label>
+          Ciudad:
+          <select
+            name="city"
+            value={formData.city}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Selecciona una opción</option>
+            <option value="Jalisco">Jalisco</option>
+            <option value="Michoacán">Michoacán</option>
+            <option value="Guanajuato">Guanajuato</option>
+            <option value="otro">Otro</option>
+          </select>
+        </label>
+        {formData.city === "otro" && (
+          <input
+            type="text"
+            name="customCity"
+            value={formData.customCity}
+            onChange={handleChange}
+            placeholder="Especifica la ciudad"
+            style={{ marginTop: "5px" }}
+            required
+          />
+        )}
+      </div>
+      <div>
+        <label>
+          Dimensiones:
+          <select
+            name="dimensions"
+            value={formData.dimensions}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Selecciona una opción</option>
+            <option value="14x14x14">14x14x14</option>
+            <option value="16x16x16">16x16x16</option>
+            <option value="otro">Otro</option>
+          </select>
+        </label>
+        {formData.dimensions === "otro" && (
+          <input
+            type="text"
+            name="customDimensions"
+            value={formData.customDimensions}
+            onChange={handleChange}
+            placeholder="Ejemplo: 25x25x25"
+            required
+          />
+        )}
+      </div>
+      <div>
+        <label>
+          Peso (lb):
+          <input
+            type="number"
+            name="weight"
+            value={formData.weight}
+            onChange={handleChange}
+            placeholder="Peso en libras"
+            required
+          />
+        </label>
+      </div>
+      <div>
+        <label>
+          Cantidad:
+          <input
+            type="number"
+            name="quantity"
+            value={formData.quantity}
+            onChange={handleChange}
+            placeholder="Cantidad de paquetes"
+            required
+          />
+        </label>
+      </div>
+      <button type="submit" disabled={isLoading} style={{ marginTop: "10px" }}>
+        {isLoading ? "Guardando..." : "Generar Etiqueta"}
+      </button>
+    </form>
+  );
+};
 
-// Iniciar el servidor
-app.listen(PORT, () => console.log(`Servidor corriendo en el puerto ${PORT}`));
+export default PackageForm;
