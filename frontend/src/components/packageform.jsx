@@ -18,7 +18,7 @@ const PackageForm = ({ onGenerateLabel }) => {
   const API_URL =
   process.env.NODE_ENV === "production"
     ? "/api/packages"
-    : "http://localhost:3000/api/packages";
+    : "https://labelmaker.onrender.com";
 
   // Maneja los cambios en los campos del formulario
   const handleChange = (e) => {
