@@ -50,11 +50,12 @@ const styles = {
     justifyContent: "space-between",
     alignItems: "flex-start",
     padding: "2rem",
+    flexWrap: "wrap", // Ajuste para dispositivos móviles
   },
   column: {
     flex: 1,
     padding: "1rem",
-    maxWidth: "50%",
+    maxWidth: "100%", // Cambia al 100% en dispositivos móviles
     boxSizing: "border-box",
   },
 };
