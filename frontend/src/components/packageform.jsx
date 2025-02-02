@@ -30,18 +30,6 @@ const PackageForm = ({ onGenerateLabel }) => {
     });
   };
 
-  const generateUniqueCode = (data) => {
-    const timestamp = Date.now().toString(36);
-    const clientPrefix = data.sender.slice(0, 3).toUpperCase();
-    const cityPrefix =
-      data.city === "otro"
-        ? data.customCity.slice(0, 3).toUpperCase()
-        : data.city.slice(0, 3).toUpperCase();
-    const randomString = Math.random().toString(36).substring(2, 6).toUpperCase();
-
-    return `${clientPrefix}-${cityPrefix}-${timestamp}-${randomString}`;
-  };
-
   const resetForm = () => {
     setFormData({
       sender: "",
@@ -89,11 +77,7 @@ const PackageForm = ({ onGenerateLabel }) => {
       return;
     }
 
-    const uniqueCode = generateUniqueCode(formData);
-
     const packageData = {
-      paquete_id: uniqueCode,
-      uniqueCode,
       sender: formData.sender,
       street: formData.street,
       postalCode: formData.postalCode,
@@ -111,11 +95,17 @@ const PackageForm = ({ onGenerateLabel }) => {
 
     try {
       const response = await axios.post(API_URL, packageData);
-      console.log("Respuesta del servidor:", response.data);
-      setStatusMessage("Paquete guardado con éxito.");
-      resetForm();
+      console.log("✅ Respuesta del servidor:", response.data);
+
+      if (response.data && response.data.paquete_id) {
+        setStatusMessage("Paquete guardado con éxito.");
+        onGenerateLabel(response.data); // 🔹 Enviar paquete completo con ID generado por MongoDB
+        resetForm();
+      } else {
+        setStatusMessage("Error: La respuesta del servidor no contiene un paquete_id.");
+      }
     } catch (error) {
-      console.error("Error al guardar el paquete:", error.response || error.message);
+      console.error("❌ Error al guardar el paquete:", error.response || error.message);
       setStatusMessage("Error al guardar el paquete. Intenta nuevamente.");
     } finally {
       setIsSubmitting(false);

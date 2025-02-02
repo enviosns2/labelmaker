@@ -5,8 +5,18 @@ import { jsPDF } from "jspdf";
 const PackageLabel = ({ packageData }) => {
   const barcodeCanvasRef = useRef(); // Se usa un <canvas> para generar el código de barras
 
-  // ✅ Usar el código único registrado en MongoDB
-  const uniqueCode = packageData?.paquete_id || "";
+  // ✅ Verificar si packageData contiene datos antes de acceder a ellos
+  if (!packageData || !packageData.paquete_id) {
+    return <p>No hay datos para mostrar. Completa el formulario para generar una etiqueta.</p>;
+  }
+
+  // ✅ Usar el código único registrado en MongoDB, sin regenerarlo
+  const uniqueCode = packageData.paquete_id;
+
+  // 🔍 Registro en consola para diagnóstico
+  useEffect(() => {
+    console.log("Código recibido en PackageLabel:", uniqueCode);
+  }, [uniqueCode]);
 
   // 🔹 Generar código de barras en el <canvas>
   useEffect(() => {
@@ -23,11 +33,6 @@ const PackageLabel = ({ packageData }) => {
 
   // 🔹 Generar PDF con la etiqueta
   const handleGeneratePDF = () => {
-    if (!packageData) {
-      alert("No hay datos para generar un PDF.");
-      return;
-    }
-
     const doc = new jsPDF({
       orientation: "portrait",
       unit: "mm",
@@ -76,10 +81,6 @@ const PackageLabel = ({ packageData }) => {
   const handlePrint = () => {
     window.print();
   };
-
-  if (!packageData) {
-    return <p>No hay datos para mostrar. Completa el formulario para generar una etiqueta.</p>;
-  }
 
   return (
     <div>
