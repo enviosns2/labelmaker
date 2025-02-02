@@ -115,7 +115,7 @@ app.get("/healthz", (req, res) => {
 // Configuración del frontend
 if (process.env.NODE_ENV === "production") {
   console.log("Servidor en modo producción. Sirviendo archivos estáticos...");
-  const staticPath = path.join(__dirname, "dist");
+  const staticPath = path.join(__dirname, "frontend", "dist"); // ✅ Ajustado para reflejar la estructura real
   app.use(express.static(staticPath));
 
   app.get("*", (req, res) => {
