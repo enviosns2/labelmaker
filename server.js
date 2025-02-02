@@ -18,7 +18,7 @@ console.log("MONGO_URI:", process.env.MONGO_URI);
 console.log("NODE_ENV:", process.env.NODE_ENV || "development");
 
 // Middleware
-app.use(cors()); // Permitir CORS para todas las solicitudes
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -36,7 +36,18 @@ mongoose
 
 // Esquema y modelo de MongoDB
 const EstadoSchema = new mongoose.Schema({
-  paquete_id: { type: String, required: true },
+  paquete_id: {
+    type: String,
+    required: true,
+    unique: true,
+    default: () => {
+      const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      const randomSegment = Array.from({ length: 8 }, () =>
+        characters[Math.floor(Math.random() * characters.length)]
+      ).join("");
+      return `DIE-MIC-${randomSegment}`;
+    },
+  },
   estado_actual: { type: String, default: "Recibido" },
   historial: [
     {
@@ -54,7 +65,6 @@ const EstadoSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
-// Ajustar el modelo para usar la colección "estados"
 const Estado = mongoose.model("Estado", EstadoSchema, "estados");
 
 // Rutas de la API
@@ -64,21 +74,29 @@ app.post("/api/packages", async (req, res) => {
   try {
     console.log("Datos recibidos en el backend:", req.body);
 
-    const { uniqueCode, ...rest } = req.body;
-    if (!uniqueCode) {
-      return res.status(400).json({ error: "El uniqueCode es obligatorio." });
+    // Validar datos requeridos
+    const requiredFields = ["sender", "street", "postalCode", "city", "dimensions", "weight", "quantity"];
+    for (const field of requiredFields) {
+      if (!req.body[field]) {
+        return res.status(400).json({ error: `El campo ${field} es obligatorio.` });
+      }
     }
 
+    // Crear nuevo paquete
     const newEstado = new Estado({
-      paquete_id: uniqueCode,
+      ...req.body,
       estado_actual: "Recibido",
       historial: [{ estado: "Recibido", fecha: new Date() }],
-      ...rest,
     });
 
     const savedEstado = await newEstado.save();
-    console.log("Paquete guardado exitosamente:", savedEstado);
-    res.status(201).json(savedEstado);
+    console.log("Paquete guardado exitosamente con ID:", savedEstado.paquete_id);
+
+    res.status(201).json({
+      success: true,
+      paquete_id: savedEstado.paquete_id,
+      ...savedEstado.toObject(),
+    });
   } catch (err) {
     console.error("Error al crear paquete:", err.message);
     res.status(500).json({ error: "Error al guardar el paquete" });

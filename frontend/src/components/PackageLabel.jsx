@@ -3,22 +3,22 @@ import JsBarcode from "jsbarcode";
 import { jsPDF } from "jspdf";
 
 const PackageLabel = ({ packageData }) => {
-  const barcodeCanvasRef = useRef(); // Se usa un <canvas> para generar el código de barras
+  const barcodeCanvasRef = useRef();
 
-  // ✅ Verificar si packageData contiene datos antes de acceder a ellos
-  if (!packageData || !packageData.paquete_id) {
+  // ✅ Validación robusta de datos recibidos
+  if (!packageData?.paquete_id) {
     return <p>No hay datos para mostrar. Completa el formulario para generar una etiqueta.</p>;
   }
 
-  // ✅ Usar el código único registrado en MongoDB, sin regenerarlo
+  // ✅ Usar EXCLUSIVAMENTE el código generado por el backend
   const uniqueCode = packageData.paquete_id;
 
-  // 🔍 Registro en consola para diagnóstico
+  // 🔍 Diagnóstico: Verificar coincidencia de códigos
   useEffect(() => {
-    console.log("Código recibido en PackageLabel:", uniqueCode);
+    console.log("Código único recibido para etiqueta:", uniqueCode);
   }, [uniqueCode]);
 
-  // 🔹 Generar código de barras en el <canvas>
+  // 🔹 Generar código de barras con el ID real
   useEffect(() => {
     if (barcodeCanvasRef.current && uniqueCode) {
       JsBarcode(barcodeCanvasRef.current, uniqueCode, {
@@ -27,86 +27,134 @@ const PackageLabel = ({ packageData }) => {
         width: 4,
         height: 80,
         displayValue: true,
+        fontOptions: "bold",
       });
     }
   }, [uniqueCode]);
 
-  // 🔹 Generar PDF con la etiqueta
+  // 🔹 Generar PDF con datos consistentes
   const handleGeneratePDF = () => {
-    const doc = new jsPDF({
-      orientation: "portrait",
-      unit: "mm",
-      format: "a4",
-    });
-
+    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
     const pageWidth = doc.internal.pageSize.getWidth();
     let yPosition = 30;
 
+    // Encabezado
     doc.setFont("helvetica", "bold");
     doc.setFontSize(16);
-    doc.text("ETIQUETA GENERADA", pageWidth / 2, yPosition, { align: "center" });
+    doc.text("ETIQUETA OFICIAL", pageWidth / 2, yPosition, { align: "center" });
     yPosition += 15;
 
-    doc.setFontSize(14);
-    doc.text(`REMITE: ${packageData.sender.toUpperCase()}`, pageWidth / 2, yPosition, { align: "center" });
-    yPosition += 10;
-    doc.text(`CALLE Y NÚMERO: ${packageData.street.toUpperCase()}`, pageWidth / 2, yPosition, { align: "center" });
-    yPosition += 10;
-    doc.text(`CÓDIGO POSTAL: ${packageData.postalCode.toUpperCase()}`, pageWidth / 2, yPosition, { align: "center" });
-    yPosition += 10;
-    doc.text(`CIUDAD: ${packageData.city.toUpperCase()}`, pageWidth / 2, yPosition, { align: "center" });
-    yPosition += 10;
-    doc.text(`DIMENSIONES: ${packageData.dimensions.toUpperCase()}`, pageWidth / 2, yPosition, { align: "center" });
-    yPosition += 10;
-    doc.text(`PESO: ${packageData.weight} LB`, pageWidth / 2, yPosition, { align: "center" });
-    yPosition += 10;
-    doc.text(`CANTIDAD: ${packageData.quantity}`, pageWidth / 2, yPosition, { align: "center" });
-    yPosition += 10;
-    doc.text(`CÓDIGO ÚNICO: ${uniqueCode}`, pageWidth / 2, yPosition, { align: "center" });
-    yPosition += 20;
+    // Datos del paquete
+    const fields = [
+      { label: "REMITE", value: packageData.sender },
+      { label: "CALLE Y NÚMERO", value: packageData.street },
+      { label: "CÓDIGO POSTAL", value: packageData.postalCode },
+      { label: "CIUDAD", value: packageData.city },
+      { label: "DIMENSIONES", value: packageData.dimensions },
+      { label: "PESO", value: `${packageData.weight} LB` },
+      { label: "CANTIDAD", value: packageData.quantity },
+      { label: "CÓDIGO ÚNICO", value: uniqueCode },
+    ];
 
-    // 🔹 Agregar código de barras
+    fields.forEach(({ label, value }) => {
+      doc.setFontSize(12);
+      doc.text(
+        `${label}: ${value.toUpperCase()}`,
+        pageWidth / 2,
+        yPosition,
+        { align: "center" }
+      );
+      yPosition += 10;
+    });
+
+    // Código de barras
     const barcodeImage = barcodeCanvasRef.current.toDataURL("image/png");
-    doc.addImage(barcodeImage, "PNG", pageWidth / 2 - 50, yPosition, 100, 30);
-    yPosition += 50;
+    doc.addImage(
+      barcodeImage,
+      "PNG",
+      pageWidth / 2 - 50,
+      yPosition + 10,
+      100,
+      30
+    );
 
-    // 🔹 Generar nombre automático del archivo
-    const date = new Date().toLocaleDateString("es-MX").replace(/\//g, "-");
-    const pdfName = `${packageData.sender.toUpperCase()}-${date}.pdf`;
-
-    doc.save(pdfName);
+    // Nombre del archivo
+    const timestamp = new Date()
+      .toLocaleString("es-MX", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+      .replace(/[/:,]/g, "-");
+    doc.save(`${uniqueCode}-${timestamp}.pdf`);
   };
 
-  // 🔹 Función para imprimir directamente
   const handlePrint = () => {
     window.print();
   };
 
   return (
-    <div>
-      <h2>Etiqueta Generada</h2>
-      <p><strong>Remitente:</strong> {packageData.sender.toUpperCase()}</p>
-      <p><strong>Calle y número:</strong> {packageData.street.toUpperCase()}</p>
-      <p><strong>Código postal:</strong> {packageData.postalCode.toUpperCase()}</p>
-      <p><strong>Ciudad:</strong> {packageData.city.toUpperCase()}</p>
-      <p><strong>Dimensiones:</strong> {packageData.dimensions.toUpperCase()}</p>
-      <p><strong>Peso:</strong> {packageData.weight} LB</p>
-      <p><strong>Cantidad:</strong> {packageData.quantity}</p>
+    <div style={{ padding: "20px", maxWidth: "600px", margin: "0 auto" }}>
+      <h2 style={{ textAlign: "center", color: "#2c3e50" }}>Etiqueta Generada</h2>
+      
+      <div style={{ backgroundColor: "#f8f9fa", padding: "15px", borderRadius: "8px" }}>
+        {/* Detalles del paquete */}
+        {[
+          { label: "Remitente", value: packageData.sender },
+          { label: "Calle y número", value: packageData.street },
+          { label: "Código postal", value: packageData.postalCode },
+          { label: "Ciudad", value: packageData.city },
+          { label: "Dimensiones", value: packageData.dimensions },
+          { label: "Peso", value: `${packageData.weight} LB` },
+          { label: "Cantidad", value: packageData.quantity },
+        ].map(({ label, value }) => (
+          <p key={label} style={{ margin: "8px 0" }}>
+            <strong>{label}:</strong> {value.toUpperCase()}
+          </p>
+        ))}
 
-      {/* Código único y código de barras */}
-      <div>
-        <p><strong>Código único:</strong> {uniqueCode}</p>
-        <canvas ref={barcodeCanvasRef}></canvas>
-      </div>
+        {/* Sección de código único */}
+        <div style={{ margin: "20px 0", textAlign: "center" }}>
+          <p style={{ fontWeight: "bold", marginBottom: "10px" }}>
+            Identificador único:
+          </p>
+          <div style={{ fontSize: "1.2em", letterSpacing: "2px", margin: "10px 0" }}>
+            {uniqueCode}
+          </div>
+          <canvas ref={barcodeCanvasRef} style={{ maxWidth: "100%" }}></canvas>
+        </div>
 
-      {/* Botones de descarga e impresión */}
-      <div style={{ marginTop: "20px" }}>
-        <button onClick={handleGeneratePDF} style={{ marginRight: "10px" }}>
-          Descargar como PDF
-        </button>
-        <button onClick={handlePrint}>
-          Imprimir Etiqueta
-        </button>
+        {/* Botones de acción */}
+        <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
+          <button
+            onClick={handleGeneratePDF}
+            style={{
+              padding: "10px 20px",
+              backgroundColor: "#3498db",
+              color: "white",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+            }}
+          >
+            Descargar PDF
+          </button>
+          <button
+            onClick={handlePrint}
+            style={{
+              padding: "10px 20px",
+              backgroundColor: "#27ae60",
+              color: "white",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+            }}
+          >
+            Imprimir
+          </button>
+        </div>
       </div>
     </div>
   );
