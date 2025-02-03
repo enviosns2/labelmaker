@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from "react"; 
 import axios from "axios";
 
 const PackageForm = ({ onGenerateLabel }) => {
@@ -14,10 +14,9 @@ const PackageForm = ({ onGenerateLabel }) => {
     quantity: "",
   });
 
-  const [statusMessage, setStatusMessage] = useState(""); // Mensajes de estado
-  const [isSubmitting, setIsSubmitting] = useState(false); // Estado de envío
+  const [statusMessage, setStatusMessage] = useState(""); 
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // URL del backend desplegado en Render
   const API_URL =
     process.env.NODE_ENV === "production"
       ? "https://labelmaker.onrender.com/api/packages"
@@ -42,7 +41,7 @@ const PackageForm = ({ onGenerateLabel }) => {
       weight: "",
       quantity: "",
     });
-    setStatusMessage(""); // Limpia el mensaje de estado
+    setStatusMessage("");
   };
 
   const isFormValid = () => {
@@ -99,7 +98,7 @@ const PackageForm = ({ onGenerateLabel }) => {
 
       if (response.data && response.data.paquete_id) {
         setStatusMessage("Paquete guardado con éxito.");
-        onGenerateLabel(response.data); // 🔹 Enviar paquete completo con ID generado por MongoDB
+        onGenerateLabel(response.data);
         resetForm();
       } else {
         setStatusMessage("Error: La respuesta del servidor no contiene un paquete_id.");
@@ -197,6 +196,13 @@ const PackageForm = ({ onGenerateLabel }) => {
             <option value="14x14x14">14x14x14</option>
             <option value="16x16x16">16x16x16</option>
             <option value="18x18x18">18x18x18</option>
+            <option value="20x20x20">20x20x20</option>
+            <option value="18x18x27">18x18x27</option>
+            <option value="22x22x22">22x22x22</option>
+            <option value="24x24x24">24x24x24</option>
+            <option value="24x24x30">24x24x30</option>
+            <option value="27x27x27">27x27x27</option>
+            <option value="30x30x30">30x30x30</option>
             <option value="otro">Otro</option>
           </select>
         </label>
@@ -241,7 +247,6 @@ const PackageForm = ({ onGenerateLabel }) => {
       <button type="submit" style={{ marginTop: "10px" }} disabled={isSubmitting}>
         {isSubmitting ? "Enviando..." : "Generar Etiqueta"}
       </button>
-      {/* Mostrar mensajes de estado */}
       {statusMessage && <p>{statusMessage}</p>}
     </form>
   );

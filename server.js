@@ -40,12 +40,17 @@ const EstadoSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    default: () => {
+    default: function () {
       const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
       const randomSegment = Array.from({ length: 8 }, () =>
         characters[Math.floor(Math.random() * characters.length)]
       ).join("");
-      return `DIE-MIC-${randomSegment}`;
+
+      // Generar prefijos con sender y city dinámicos
+      const senderPrefix = this.sender ? this.sender.substring(0, 3).toUpperCase() : "XXX";
+      const cityPrefix = this.city ? this.city.substring(0, 3).toUpperCase() : "YYY";
+
+      return `${senderPrefix}-${cityPrefix}-${randomSegment}`;
     },
   },
   estado_actual: { type: String, default: "Recibido" },
