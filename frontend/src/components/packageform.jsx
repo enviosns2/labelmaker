@@ -12,6 +12,8 @@ const PackageForm = ({ onGenerateLabel }) => {
     customDimensions: "",
     weight: "",
     quantity: "",
+    email: "", // Nuevo campo
+    phone: "", // Nuevo campo
   });
 
   const [statusMessage, setStatusMessage] = useState(""); 
@@ -40,6 +42,8 @@ const PackageForm = ({ onGenerateLabel }) => {
       customDimensions: "",
       weight: "",
       quantity: "",
+      email: "", // Reset nuevo campo
+      phone: "", // Reset nuevo campo
     });
     setStatusMessage("");
   };
@@ -55,6 +59,8 @@ const PackageForm = ({ onGenerateLabel }) => {
       customDimensions,
       weight,
       quantity,
+      email, // Nuevo campo
+      phone, // Nuevo campo
     } = formData;
 
     return (
@@ -63,6 +69,7 @@ const PackageForm = ({ onGenerateLabel }) => {
       postalCode &&
       weight &&
       quantity &&
+      email && // ✅ Solo email es obligatorio
       (city !== "otro" || customCity) &&
       (dimensions !== "otro" || customDimensions)
     );
@@ -87,6 +94,8 @@ const PackageForm = ({ onGenerateLabel }) => {
           : formData.dimensions,
       weight: formData.weight,
       quantity: formData.quantity,
+      email: formData.email, // Envío nuevo campo
+      phone: formData.phone, // Envío nuevo campo
     };
 
     setStatusMessage("Enviando datos...");
@@ -155,6 +164,36 @@ const PackageForm = ({ onGenerateLabel }) => {
           />
         </label>
       </div>
+
+      {/* Nuevo campo - Correo electrónico */}
+      <div>
+        <label>
+          Correo electrónico:
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="Correo electrónico"
+            required
+          />
+        </label>
+      </div>
+
+      {/* Nuevo campo - Teléfono */}
+      <div>
+        <label>
+          Teléfono:
+          <input
+            type="tel"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            placeholder="Número telefónico"
+          />
+        </label>
+      </div>
+
       <div>
         <label>
           Ciudad:

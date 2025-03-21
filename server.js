@@ -67,6 +67,9 @@ const EstadoSchema = new mongoose.Schema({
   dimensions: { type: String, required: true },
   weight: { type: String, required: true },
   quantity: { type: Number, required: true },
+  // 🔥 Se agrega aquí para que se almacenen
+  email: { type: String, required: false },
+  phone: { type: String, required: false },
   createdAt: { type: Date, default: Date.now },
 });
 
@@ -105,6 +108,55 @@ app.post("/api/packages", async (req, res) => {
   } catch (err) {
     console.error("Error al crear paquete:", err.message);
     res.status(500).json({ error: "Error al guardar el paquete" });
+  }
+});
+
+// ✅ NUEVO ENDPOINT /api/packages/extended SIN ALTERAR NADA DE LO ANTERIOR
+app.post("/api/packages/extended", async (req, res) => {
+  try {
+    console.log("Datos recibidos en /api/packages/extended:", req.body);
+
+    const { sender, street, postalCode, city, dimensions, weight, quantity, email, phone } = req.body;
+
+    // Validar campos obligatorios
+    const requiredFields = ["sender", "street", "postalCode", "city", "dimensions", "weight", "quantity"];
+    for (const field of requiredFields) {
+      if (!req.body[field]) {
+        return res.status(400).json({ error: `El campo ${field} es obligatorio.` });
+      }
+    }
+
+    // Validar que el email venga sí o sí
+    if (!email) {
+      return res.status(400).json({ error: "El campo email es obligatorio." });
+    }
+
+    // Crear nuevo paquete incluyendo email (obligatorio) y phone (opcional)
+    const newEstado = new Estado({
+      sender,
+      street,
+      postalCode,
+      city,
+      dimensions,
+      weight,
+      quantity,
+      email,
+      phone: phone || null,
+      estado_actual: "Recibido",
+      historial: [{ estado: "Recibido", fecha: new Date() }],
+    });
+
+    const savedEstado = await newEstado.save();
+    console.log("Paquete (extended) guardado con ID:", savedEstado.paquete_id);
+
+    res.status(201).json({
+      success: true,
+      paquete_id: savedEstado.paquete_id,
+      ...savedEstado.toObject(),
+    });
+  } catch (err) {
+    console.error("Error al crear paquete (extended):", err.message);
+    res.status(500).json({ error: "Error al guardar el paquete en extended" });
   }
 });
 
