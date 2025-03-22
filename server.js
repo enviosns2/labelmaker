@@ -2,10 +2,13 @@ const path = require("path");
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const axios = require("axios"); // ✅ Requerido para el webhook
 require("dotenv").config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+const MAKE_WEBHOOK_URL = 'https://hook.us2.make.com/1ebc7t08rlh3o04hy9du0ryz6uxjmbco'; // ✅ URL de tu Webhook de Make
 
 // Verificar variables de entorno
 if (!process.env.MONGO_URI) {
@@ -46,7 +49,6 @@ const EstadoSchema = new mongoose.Schema({
         characters[Math.floor(Math.random() * characters.length)]
       ).join("");
 
-      // Generar prefijos con sender y city dinámicos
       const senderPrefix = this.sender ? this.sender.substring(0, 3).toUpperCase() : "XXX";
       const cityPrefix = this.city ? this.city.substring(0, 3).toUpperCase() : "YYY";
 
@@ -67,7 +69,6 @@ const EstadoSchema = new mongoose.Schema({
   dimensions: { type: String, required: true },
   weight: { type: String, required: true },
   quantity: { type: Number, required: true },
-  // 🔥 Se agrega aquí para que se almacenen
   email: { type: String, required: false },
   phone: { type: String, required: false },
   createdAt: { type: Date, default: Date.now },
@@ -82,7 +83,6 @@ app.post("/api/packages", async (req, res) => {
   try {
     console.log("Datos recibidos en el backend:", req.body);
 
-    // Validar datos requeridos
     const requiredFields = ["sender", "street", "postalCode", "city", "dimensions", "weight", "quantity"];
     for (const field of requiredFields) {
       if (!req.body[field]) {
@@ -90,7 +90,6 @@ app.post("/api/packages", async (req, res) => {
       }
     }
 
-    // Crear nuevo paquete
     const newEstado = new Estado({
       ...req.body,
       estado_actual: "Recibido",
@@ -99,6 +98,13 @@ app.post("/api/packages", async (req, res) => {
 
     const savedEstado = await newEstado.save();
     console.log("Paquete guardado exitosamente con ID:", savedEstado.paquete_id);
+
+    // ✅ Enviar webhook a Make
+    await axios.post(MAKE_WEBHOOK_URL, {
+      paquete_id: savedEstado.paquete_id,
+      ...req.body,
+      createdAt: savedEstado.createdAt
+    });
 
     res.status(201).json({
       success: true,
@@ -118,7 +124,6 @@ app.post("/api/packages/extended", async (req, res) => {
 
     const { sender, street, postalCode, city, dimensions, weight, quantity, email, phone } = req.body;
 
-    // Validar campos obligatorios
     const requiredFields = ["sender", "street", "postalCode", "city", "dimensions", "weight", "quantity"];
     for (const field of requiredFields) {
       if (!req.body[field]) {
@@ -126,12 +131,10 @@ app.post("/api/packages/extended", async (req, res) => {
       }
     }
 
-    // Validar que el email venga sí o sí
     if (!email) {
       return res.status(400).json({ error: "El campo email es obligatorio." });
     }
 
-    // Crear nuevo paquete incluyendo email (obligatorio) y phone (opcional)
     const newEstado = new Estado({
       sender,
       street,
@@ -172,7 +175,7 @@ app.get("/healthz", (req, res) => {
 // Configuración del frontend
 if (process.env.NODE_ENV === "production") {
   console.log("Servidor en modo producción. Sirviendo archivos estáticos...");
-  const staticPath = path.join(__dirname, "frontend", "dist"); // ✅ Ajustado para reflejar la estructura real
+  const staticPath = path.join(__dirname, "frontend", "dist");
   app.use(express.static(staticPath));
 
   app.get("*", (req, res) => {
