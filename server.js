@@ -8,7 +8,7 @@ require("dotenv").config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const MAKE_WEBHOOK_URL = 'https://hook.us2.make.com/1ebc7t08rlh3o04hy9du0ryz6uxjmbco'; // ✅ URL de tu Webhook de Make
+const MAKE_WEBHOOK_URL = 'https://hook.us2.make.com/tude7fnv9fy5j2la8mswngb5qplkx01q'; // ✅ URL de tu Webhook de Make
 
 // Verificar variables de entorno
 if (!process.env.MONGO_URI) {
