@@ -8,8 +8,30 @@ require("dotenv").config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ✅ Webhook actualizado
-const MAKE_WEBHOOK_URL = 'https://hook.us2.make.com/tude7fnv9fy5j2la8mswngb5qplkx01q'; 
+// ✅ Webhooks configurados
+const MAKE_WEBHOOK_ENVIO = 'https://hook.us2.make.com/tude7fnv9fy5j2la8mswngb5qplkx01q'; // Escenario 1
+const MAKE_WEBHOOK_RASTREO = 'https://hook.us2.make.com/bdlqk882e93qn9paiagq8ea6x7qgpf29'; // Escenario 2
+
+const axios = require('axios');
+
+// Función genérica para enviar datos a cualquier webhook de Make
+const sendToMake = async (webhookUrl, data) => {
+  try {
+    const response = await axios.post(webhookUrl, data);
+    console.log('✅ Webhook enviado:', webhookUrl, response.status);
+  } catch (error) {
+    console.error('❌ Error al enviar al webhook:', webhookUrl, error.message);
+  }
+};
+
+// Ejemplo de uso (puedes llamar uno o ambos según la lógica de tu backend)
+const procesarEnvio = async (datosEnvio) => {
+  // Enviar al primer escenario
+  await sendToMake(MAKE_WEBHOOK_ENVIO, datosEnvio);
+
+  // Enviar al segundo escenario si lo necesitas
+  await sendToMake(MAKE_WEBHOOK_RASTREO, datosEnvio);
+};
 
 // Verificar variables de entorno
 if (!process.env.MONGO_URI) {
