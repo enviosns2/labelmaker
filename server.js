@@ -12,7 +12,6 @@ const PORT = process.env.PORT || 3000;
 const MAKE_WEBHOOK_ENVIO = 'https://hook.us2.make.com/tude7fnv9fy5j2la8mswngb5qplkx01q'; // Escenario 1
 const MAKE_WEBHOOK_RASTREO = 'https://hook.us2.make.com/bdlqk882e93qn9paiagq8ea6x7qgpf29'; // Escenario 2
 
-const axios = require('axios');
 
 // Función genérica para enviar datos a cualquier webhook de Make
 const sendToMake = async (webhookUrl, data) => {
