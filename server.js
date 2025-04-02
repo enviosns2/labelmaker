@@ -12,7 +12,6 @@ const PORT = process.env.PORT || 3000;
 const MAKE_WEBHOOK_ENVIO = 'https://hook.us2.make.com/tude7fnv9fy5j2la8mswngb5qplkx01q'; // Escenario 1
 const MAKE_WEBHOOK_RASTREO = 'https://hook.us2.make.com/bdlqk882e93qn9paiagq8ea6x7qgpf29'; // Escenario 2
 
-
 // Función genérica para enviar datos a cualquier webhook de Make
 const sendToMake = async (webhookUrl, data) => {
   try {
@@ -122,7 +121,7 @@ app.post("/api/packages", async (req, res) => {
     console.log("Paquete guardado exitosamente con ID:", savedEstado.paquete_id);
 
     // ✅ Enviar webhook a Make
-    await axios.post(MAKE_WEBHOOK_URL, {
+    await procesarEnvio({
       paquete_id: savedEstado.paquete_id,
       ...req.body,
       createdAt: savedEstado.createdAt
