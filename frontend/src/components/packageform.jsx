@@ -1,4 +1,4 @@
-import React, { useState } from "react"; 
+import React, { useState } from "react";
 import axios from "axios";
 
 const PackageForm = ({ onGenerateLabel }) => {
@@ -16,7 +16,7 @@ const PackageForm = ({ onGenerateLabel }) => {
     phone: "", // Nuevo campo
   });
 
-  const [statusMessage, setStatusMessage] = useState(""); 
+  const [statusMessage, setStatusMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const API_URL =
@@ -42,8 +42,8 @@ const PackageForm = ({ onGenerateLabel }) => {
       customDimensions: "",
       weight: "",
       quantity: "",
-      email: "", // Reset nuevo campo
-      phone: "", // Reset nuevo campo
+      email: "",
+      phone: "",
     });
     setStatusMessage("");
   };
@@ -59,8 +59,8 @@ const PackageForm = ({ onGenerateLabel }) => {
       customDimensions,
       weight,
       quantity,
-      email, // Nuevo campo
-      phone, // Nuevo campo
+      email,
+      phone,
     } = formData;
 
     return (
@@ -69,7 +69,7 @@ const PackageForm = ({ onGenerateLabel }) => {
       postalCode &&
       weight &&
       quantity &&
-      email && // ✅ Solo email es obligatorio
+      email &&
       (city !== "otro" || customCity) &&
       (dimensions !== "otro" || customDimensions)
     );
@@ -87,15 +87,18 @@ const PackageForm = ({ onGenerateLabel }) => {
       sender: formData.sender,
       street: formData.street,
       postalCode: formData.postalCode,
-      city: formData.city === "otro" ? formData.customCity : formData.city,
+      city:
+        formData.city === "otro"
+          ? formData.customCity
+          : formData.city,
       dimensions:
         formData.dimensions === "otro"
           ? formData.customDimensions
           : formData.dimensions,
       weight: formData.weight,
       quantity: formData.quantity,
-      email: formData.email, // Envío nuevo campo
-      phone: formData.phone, // Envío nuevo campo
+      email: formData.email,
+      phone: formData.phone,
     };
 
     setStatusMessage("Enviando datos...");
@@ -140,34 +143,6 @@ const PackageForm = ({ onGenerateLabel }) => {
       </div>
       <div>
         <label>
-          Calle y número:
-          <input
-            type="text"
-            name="street"
-            value={formData.street}
-            onChange={handleChange}
-            placeholder="Calle y número"
-            required
-          />
-        </label>
-      </div>
-      <div>
-        <label>
-          Código postal:
-          <input
-            type="text"
-            name="postalCode"
-            value={formData.postalCode}
-            onChange={handleChange}
-            placeholder="Código postal"
-            required
-          />
-        </label>
-      </div>
-
-      {/* Nuevo campo - Correo electrónico */}
-      <div>
-        <label>
           Correo electrónico:
           <input
             type="email"
@@ -179,8 +154,6 @@ const PackageForm = ({ onGenerateLabel }) => {
           />
         </label>
       </div>
-
-      {/* Nuevo campo - Teléfono */}
       <div>
         <label>
           Teléfono:
@@ -193,7 +166,6 @@ const PackageForm = ({ onGenerateLabel }) => {
           />
         </label>
       </div>
-
       <div>
         <label>
           Estado:
@@ -221,6 +193,32 @@ const PackageForm = ({ onGenerateLabel }) => {
             required
           />
         )}
+      </div>
+      <div>
+        <label>
+          Código postal:
+          <input
+            type="text"
+            name="postalCode"
+            value={formData.postalCode}
+            onChange={handleChange}
+            placeholder="Código postal"
+            required
+          />
+        </label>
+      </div>
+      <div>
+        <label>
+          Calle y número:
+          <input
+            type="text"
+            name="street"
+            value={formData.street}
+            onChange={handleChange}
+            placeholder="Calle y número"
+            required
+          />
+        </label>
       </div>
       <div>
         <label>
