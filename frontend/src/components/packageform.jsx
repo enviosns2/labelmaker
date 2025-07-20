@@ -196,7 +196,7 @@ const PackageForm = ({ onGenerateLabel }) => {
 
       <div>
         <label>
-          Ciudad:
+          Estado:
           <select
             name="city"
             value={formData.city}
