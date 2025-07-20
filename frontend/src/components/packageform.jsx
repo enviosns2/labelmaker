@@ -281,7 +281,19 @@ const PackageForm = ({ onGenerateLabel }) => {
           />
         </label>
       </div>
-      <button type="submit" style={{ marginTop: "10px" }} disabled={isSubmitting}>
+      <button
+        type="submit"
+        style={{
+          marginTop: "10px",
+          backgroundColor: "#014235",
+          color: "#fff",
+          border: "none",
+          padding: "10px 20px",
+          borderRadius: "4px",
+          cursor: "pointer",
+        }}
+        disabled={isSubmitting}
+      >
         {isSubmitting ? "Enviando..." : "Generar Etiqueta"}
       </button>
       {statusMessage && <p>{statusMessage}</p>}
