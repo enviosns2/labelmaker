@@ -83,7 +83,8 @@ const EstadoSchema = new mongoose.Schema({
       fecha: { type: Date, default: Date.now },
     },
   ],
-  sender: { type: String, required: true },
+  recipient: { type: String, required: true },
+  agency: { type: String, required: true },
   street: { type: String, required: true },
   postalCode: { type: String, required: true },
   city: { type: String, required: true },
@@ -104,7 +105,7 @@ app.post("/api/packages", async (req, res) => {
   try {
     console.log("Datos recibidos en el backend:", req.body);
 
-    const requiredFields = ["sender", "street", "postalCode", "city", "dimensions", "weight", "quantity"];
+    const requiredFields = ["recipient", "agency", "street", "postalCode", "city", "dimensions", "weight", "quantity"];
     for (const field of requiredFields) {
       if (!req.body[field]) {
         return res.status(400).json({ error: `El campo ${field} es obligatorio.` });
@@ -143,9 +144,9 @@ app.post("/api/packages/extended", async (req, res) => {
   try {
     console.log("Datos recibidos en /api/packages/extended:", req.body);
 
-    const { sender, street, postalCode, city, dimensions, weight, quantity, email, phone } = req.body;
+    const { recipient, agency, street, postalCode, city, dimensions, weight, quantity, email, phone } = req.body;
 
-    const requiredFields = ["sender", "street", "postalCode", "city", "dimensions", "weight", "quantity"];
+    const requiredFields = ["recipient", "agency", "street", "postalCode", "city", "dimensions", "weight", "quantity"];
     for (const field of requiredFields) {
       if (!req.body[field]) {
         return res.status(400).json({ error: `El campo ${field} es obligatorio.` });
@@ -157,7 +158,8 @@ app.post("/api/packages/extended", async (req, res) => {
     }
 
     const newEstado = new Estado({
-      sender,
+      recipient,
+      agency,
       street,
       postalCode,
       city,

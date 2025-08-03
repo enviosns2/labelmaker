@@ -35,7 +35,8 @@ const PackageLabel = ({ packageData }) => {
 
   // ✅ Declarar fields antes de su uso
   const fields = [
-    { label: "REMITE", value: packageData.sender },
+    { label: "DESTINATARIO", value: packageData.recipient },
+    { label: "AGENCIA", value: packageData.agency },
     { label: "CALLE Y NÚMERO", value: packageData.street },
     { label: "CÓDIGO POSTAL", value: packageData.postalCode },
     { label: "CIUDAD", value: packageData.city },

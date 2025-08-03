@@ -3,7 +3,8 @@ import axios from "axios";
 
 const PackageForm = ({ onGenerateLabel }) => {
   const [formData, setFormData] = useState({
-    sender: "",
+    recipient: "",
+    agency: "",
     street: "",
     postalCode: "",
     city: "",
@@ -12,8 +13,8 @@ const PackageForm = ({ onGenerateLabel }) => {
     customDimensions: "",
     weight: "",
     quantity: "",
-    email: "", // Nuevo campo
-    phone: "", // Nuevo campo
+    email: "",
+    phone: "",
   });
 
   const [statusMessage, setStatusMessage] = useState("");
@@ -50,7 +51,8 @@ const PackageForm = ({ onGenerateLabel }) => {
 
   const isFormValid = () => {
     const {
-      sender,
+      recipient,
+      agency,
       street,
       postalCode,
       city,
@@ -64,7 +66,8 @@ const PackageForm = ({ onGenerateLabel }) => {
     } = formData;
 
     return (
-      sender &&
+      recipient &&
+      agency &&
       street &&
       postalCode &&
       weight &&
@@ -84,7 +87,8 @@ const PackageForm = ({ onGenerateLabel }) => {
     }
 
     const packageData = {
-      sender: formData.sender,
+      recipient: formData.recipient,
+      agency: formData.agency,
       street: formData.street,
       postalCode: formData.postalCode,
       city:
@@ -130,13 +134,26 @@ const PackageForm = ({ onGenerateLabel }) => {
     >
       <div>
         <label>
-          Remitente:
+          Destinatario:
           <input
             type="text"
-            name="sender"
-            value={formData.sender}
+            name="recipient"
+            value={formData.recipient}
             onChange={handleChange}
-            placeholder="Nombre del remitente"
+            placeholder="Nombre del destinatario"
+            required
+          />
+        </label>
+      </div>
+      <div>
+        <label>
+          Agencia:
+          <input
+            type="text"
+            name="agency"
+            value={formData.agency}
+            onChange={handleChange}
+            placeholder="Nombre de la agencia"
             required
           />
         </label>
