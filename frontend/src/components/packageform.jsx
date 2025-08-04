@@ -196,6 +196,23 @@ const PackageForm = ({ onGenerateLabel }) => {
       </div>
       <div>
         <label>
+          País destino:
+          <select
+            name="destinationCountry"
+            value={formData.destinationCountry}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Selecciona un país</option>
+            <option value="Estados Unidos">Estados Unidos</option>
+            <option value="México">México</option>
+            <option value="Guatemala">Guatemala</option>
+            <option value="El Salvador">El Salvador</option>
+          </select>
+        </label>
+      </div>
+      <div>
+        <label>
           Estado:
           <select
             name="city"
@@ -320,23 +337,6 @@ const PackageForm = ({ onGenerateLabel }) => {
             placeholder="Cantidad de paquetes"
             required
           />
-        </label>
-      </div>
-      <div>
-        <label>
-          País destino:
-          <select
-            name="destinationCountry"
-            value={formData.destinationCountry}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Selecciona un país</option>
-            <option value="Estados Unidos">Estados Unidos</option>
-            <option value="México">México</option>
-            <option value="Guatemala">Guatemala</option>
-            <option value="El Salvador">El Salvador</option>
-          </select>
         </label>
       </div>
       <button
