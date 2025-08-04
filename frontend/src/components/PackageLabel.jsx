@@ -45,6 +45,7 @@ const PackageLabel = ({ packageData }) => {
     { label: "PESO", value: `${packageData.weight} LB` },
     { label: "CANTIDAD", value: packageData.quantity },
     { label: "CÓDIGO ÚNICO", value: uniqueCode },
+    { label: "PAÍS DESTINO", value: packageData.destinationCountry },
   ];
 
   const handleGeneratePDF = () => {

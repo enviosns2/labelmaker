@@ -95,6 +95,7 @@ const EstadoSchema = new mongoose.Schema({
   quantity: { type: Number, required: true },
   email: { type: String, required: false },
   phone: { type: String, required: false },
+  destinationCountry: { type: String, required: true }, // Nuevo campo
   createdAt: { type: Date, default: Date.now },
 });
 
@@ -107,7 +108,7 @@ app.post("/api/packages", async (req, res) => {
   try {
     console.log("Datos recibidos en el backend:", req.body);
 
-    const requiredFields = ["recipient", "agency", "street", "colonia", "postalCode", "city", "dimensions", "weight", "quantity"];
+    const requiredFields = ["recipient", "agency", "street", "colonia", "postalCode", "city", "dimensions", "weight", "quantity", "destinationCountry"];
     for (const field of requiredFields) {
       if (!req.body[field]) {
         return res.status(400).json({ error: `El campo ${field} es obligatorio.` });

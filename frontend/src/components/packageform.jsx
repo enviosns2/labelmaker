@@ -16,6 +16,7 @@ const PackageForm = ({ onGenerateLabel }) => {
     quantity: "",
     email: "",
     phone: "",
+    destinationCountry: "", // Nuevo campo
   });
 
   const [statusMessage, setStatusMessage] = useState("");
@@ -48,6 +49,7 @@ const PackageForm = ({ onGenerateLabel }) => {
       quantity: "",
       email: "",
       phone: "",
+      destinationCountry: "", // Nuevo campo
     });
     setStatusMessage("");
   };
@@ -67,6 +69,7 @@ const PackageForm = ({ onGenerateLabel }) => {
       quantity,
       email,
       phone,
+      destinationCountry,
     } = formData;
 
     return (
@@ -79,7 +82,8 @@ const PackageForm = ({ onGenerateLabel }) => {
       quantity &&
       email &&
       (city !== "otro" || customCity) &&
-      (dimensions !== "otro" || customDimensions)
+      (dimensions !== "otro" || customDimensions) &&
+      destinationCountry
     );
   };
 
@@ -109,6 +113,7 @@ const PackageForm = ({ onGenerateLabel }) => {
       quantity: formData.quantity,
       email: formData.email,
       phone: formData.phone,
+      destinationCountry: formData.destinationCountry,
     };
 
     setStatusMessage("Enviando datos...");
@@ -315,6 +320,23 @@ const PackageForm = ({ onGenerateLabel }) => {
             placeholder="Cantidad de paquetes"
             required
           />
+        </label>
+      </div>
+      <div>
+        <label>
+          País destino:
+          <select
+            name="destinationCountry"
+            value={formData.destinationCountry}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Selecciona un país</option>
+            <option value="Estados Unidos">Estados Unidos</option>
+            <option value="México">México</option>
+            <option value="Guatemala">Guatemala</option>
+            <option value="El Salvador">El Salvador</option>
+          </select>
         </label>
       </div>
       <button
