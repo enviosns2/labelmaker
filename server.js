@@ -70,10 +70,11 @@ const EstadoSchema = new mongoose.Schema({
         characters[Math.floor(Math.random() * characters.length)]
       ).join("");
 
-      const senderPrefix = this.sender ? this.sender.substring(0, 3).toUpperCase() : "XXX";
+      // Primeros 3 dígitos del destinatario (recipient)
+      const recipientPrefix = this.recipient ? this.recipient.substring(0, 3).toUpperCase() : "XXX";
       const cityPrefix = this.city ? this.city.substring(0, 3).toUpperCase() : "YYY";
 
-      return `${senderPrefix}-${cityPrefix}-${randomSegment}`;
+      return `${recipientPrefix}-${cityPrefix}-${randomSegment}`;
     },
   },
   estado_actual: { type: String, default: "Recibido" },
