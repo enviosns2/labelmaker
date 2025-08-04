@@ -96,7 +96,24 @@ const PackageLabel = ({ packageData }) => {
 
     const win = window.open("", "", "height=700,width=700");
     win.document.write("<html><head><title>Etiqueta Oficial</title>");
-    win.document.write("<style>body{font-family:Arial,sans-serif;} p{margin:8px 0;} .barcode{margin:20px 0;text-align:center;}</style>");
+    win.document.write(`
+      <style>
+        @page {
+          margin: 0; /* Eliminar márgenes de impresión */
+        }
+        body {
+          margin: 0;
+          font-family: Arial, sans-serif;
+        }
+        p {
+          margin: 8px 0;
+        }
+        .barcode {
+          margin: 20px 0;
+          text-align: center;
+        }
+      </style>
+    `);
     win.document.write("</head><body>");
     win.document.write(printContents);
     win.document.write(barcodeImageHTML); // Agregar la imagen del código de barras
