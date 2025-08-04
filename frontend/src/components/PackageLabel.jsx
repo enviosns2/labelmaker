@@ -86,11 +86,20 @@ const PackageLabel = ({ packageData }) => {
   // Imprimir solo la etiqueta
   const handlePrint = () => {
     const printContents = document.getElementById("print-label").innerHTML;
+    const barcodeCanvas = barcodeCanvasRef.current;
+
+    let barcodeImageHTML = "";
+    if (barcodeCanvas) {
+      const barcodeImage = barcodeCanvas.toDataURL("image/png");
+      barcodeImageHTML = `<img src="${barcodeImage}" alt="Código de barras" style="max-width:100%; margin:20px 0;"/>`;
+    }
+
     const win = window.open("", "", "height=700,width=700");
     win.document.write("<html><head><title>Etiqueta Oficial</title>");
     win.document.write("<style>body{font-family:Arial,sans-serif;} p{margin:8px 0;} .barcode{margin:20px 0;text-align:center;}</style>");
     win.document.write("</head><body>");
     win.document.write(printContents);
+    win.document.write(barcodeImageHTML); // Agregar la imagen del código de barras
     win.document.write("</body></html>");
     win.document.close();
     win.focus();
