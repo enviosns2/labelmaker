@@ -38,7 +38,7 @@ const PackageLabel = ({ packageData }) => {
     { label: "DESTINATARIO", value: packageData.recipient },
     { label: "AGENCIA", value: packageData.agency },
     { label: "CALLE Y NÚMERO", value: packageData.street },
-    { label: "COLONIA", value: packageData.colonia }, // Nuevo campo
+    { label: "COLONIA", value: packageData.colonia },
     { label: "CÓDIGO POSTAL", value: packageData.postalCode },
     { label: "CIUDAD", value: packageData.city },
     { label: "DIMENSIONES", value: packageData.dimensions },
@@ -83,63 +83,76 @@ const PackageLabel = ({ packageData }) => {
     doc.save(`${uniqueCode}-${timestamp}.pdf`);
   };
 
+  // Imprimir solo la etiqueta
   const handlePrint = () => {
-    window.print();
+    const printContents = document.getElementById("print-label").innerHTML;
+    const win = window.open("", "", "height=700,width=700");
+    win.document.write("<html><head><title>Etiqueta Oficial</title>");
+    win.document.write("<style>body{font-family:Arial,sans-serif;} p{margin:8px 0;} .barcode{margin:20px 0;text-align:center;}</style>");
+    win.document.write("</head><body>");
+    win.document.write(printContents);
+    win.document.write("</body></html>");
+    win.document.close();
+    win.focus();
+    setTimeout(() => {
+      win.print();
+      win.close();
+    }, 500);
   };
 
   return (
-    <div style={{ padding: "20px", maxWidth: "600px", margin: "0 auto" }}>
-      <h2 style={{ textAlign: "center", color: "#2c3e50" }}>Etiqueta Oficial</h2>
-      <div style={{ backgroundColor: "#f8f9fa", padding: "15px", borderRadius: "8px" }}>
-        {fields.map(({ label, value }) => (
-          <p
-            key={label}
-            style={{
-              margin: "8px 0",
-              wordBreak: "break-word",
-              whiteSpace: "pre-line",
-              fontSize: "1em",
-              maxWidth: "100%",
-            }}
-          >
-            <strong>{label}:</strong> {typeof value === "string" ? value : value}
-          </p>
-        ))}
-
-        <div style={{ margin: "20px 0", textAlign: "center" }}>
-          <p style={{ fontWeight: "bold", marginBottom: "10px" }}>Identificador único:</p>
-          <div style={{ fontSize: "1.2em", letterSpacing: "2px", margin: "10px 0" }}>{uniqueCode}</div>
-          <canvas ref={barcodeCanvasRef} style={{ maxWidth: "100%" }}></canvas>
+    <div>
+      <div id="print-label" style={{ padding: "20px", maxWidth: "600px", margin: "0 auto" }}>
+        <h2 style={{ textAlign: "center", color: "#2c3e50" }}>Etiqueta Oficial</h2>
+        <div style={{ backgroundColor: "#f8f9fa", padding: "15px", borderRadius: "8px" }}>
+          {fields.map(({ label, value }) => (
+            <p
+              key={label}
+              style={{
+                margin: "8px 0",
+                wordBreak: "break-word",
+                whiteSpace: "pre-line",
+                fontSize: "1em",
+                maxWidth: "100%",
+              }}
+            >
+              <strong>{label}:</strong> {typeof value === "string" ? value : value}
+            </p>
+          ))}
+          <div className="barcode" style={{ margin: "20px 0", textAlign: "center" }}>
+            <p style={{ fontWeight: "bold", marginBottom: "10px" }}>Identificador único:</p>
+            <div style={{ fontSize: "1.2em", letterSpacing: "2px", margin: "10px 0" }}>{uniqueCode}</div>
+            <canvas ref={barcodeCanvasRef} style={{ maxWidth: "100%" }}></canvas>
+          </div>
         </div>
-
-        <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
-          <button
-            onClick={handleGeneratePDF}
-            style={{
-              padding: "10px 20px",
-              backgroundColor: "#3498db",
-              color: "white",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer",
-            }}
-          >
-            Descargar PDF
-          </button>
-          <button
-            onClick={handlePrint}
-            style={{
-              padding: "10px 20px",
-              backgroundColor: "#27ae60",
-              color: "white",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer",
-            }}
-          >
-            Imprimir
-          </button>
-        </div>
+      </div>
+      <div style={{ display: "flex", gap: "10px", justifyContent: "center", marginTop: "10px" }}>
+        <button
+          onClick={handleGeneratePDF}
+          style={{
+            padding: "10px 20px",
+            backgroundColor: "#3498db",
+            color: "white",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+          }}
+        >
+          Descargar PDF
+        </button>
+        <button
+          onClick={handlePrint}
+          style={{
+            padding: "10px 20px",
+            backgroundColor: "#27ae60",
+            color: "white",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+          }}
+        >
+          Imprimir
+        </button>
       </div>
     </div>
   );
