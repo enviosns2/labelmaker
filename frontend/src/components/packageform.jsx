@@ -6,6 +6,7 @@ const PackageForm = ({ onGenerateLabel }) => {
     recipient: "",
     agency: "",
     street: "",
+    colonia: "", // Nuevo campo
     postalCode: "",
     city: "",
     customCity: "",
@@ -34,8 +35,10 @@ const PackageForm = ({ onGenerateLabel }) => {
 
   const resetForm = () => {
     setFormData({
-      sender: "",
+      recipient: "",
+      agency: "",
       street: "",
+      colonia: "",
       postalCode: "",
       city: "",
       customCity: "",
@@ -54,6 +57,7 @@ const PackageForm = ({ onGenerateLabel }) => {
       recipient,
       agency,
       street,
+      colonia,
       postalCode,
       city,
       customCity,
@@ -69,6 +73,7 @@ const PackageForm = ({ onGenerateLabel }) => {
       recipient &&
       agency &&
       street &&
+      colonia &&
       postalCode &&
       weight &&
       quantity &&
@@ -90,6 +95,7 @@ const PackageForm = ({ onGenerateLabel }) => {
       recipient: formData.recipient,
       agency: formData.agency,
       street: formData.street,
+      colonia: formData.colonia,
       postalCode: formData.postalCode,
       city:
         formData.city === "otro"
@@ -213,19 +219,6 @@ const PackageForm = ({ onGenerateLabel }) => {
       </div>
       <div>
         <label>
-          Código postal:
-          <input
-            type="text"
-            name="postalCode"
-            value={formData.postalCode}
-            onChange={handleChange}
-            placeholder="Código postal"
-            required
-          />
-        </label>
-      </div>
-      <div>
-        <label>
           Calle y número:
           <input
             type="text"
@@ -233,6 +226,32 @@ const PackageForm = ({ onGenerateLabel }) => {
             value={formData.street}
             onChange={handleChange}
             placeholder="Calle y número"
+            required
+          />
+        </label>
+      </div>
+      <div>
+        <label>
+          Colonia:
+          <input
+            type="text"
+            name="colonia"
+            value={formData.colonia}
+            onChange={handleChange}
+            placeholder="Colonia"
+            required
+          />
+        </label>
+      </div>
+      <div>
+        <label>
+          Código postal:
+          <input
+            type="text"
+            name="postalCode"
+            value={formData.postalCode}
+            onChange={handleChange}
+            placeholder="Código postal"
             required
           />
         </label>

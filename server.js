@@ -70,11 +70,10 @@ const EstadoSchema = new mongoose.Schema({
         characters[Math.floor(Math.random() * characters.length)]
       ).join("");
 
-      // Cambiado: usar recipient en vez de sender
-      const recipientPrefix = this.recipient ? this.recipient.substring(0, 3).toUpperCase() : "XXX";
+      const senderPrefix = this.sender ? this.sender.substring(0, 3).toUpperCase() : "XXX";
       const cityPrefix = this.city ? this.city.substring(0, 3).toUpperCase() : "YYY";
 
-      return `${recipientPrefix}-${cityPrefix}-${randomSegment}`;
+      return `${senderPrefix}-${cityPrefix}-${randomSegment}`;
     },
   },
   estado_actual: { type: String, default: "Recibido" },
@@ -87,6 +86,7 @@ const EstadoSchema = new mongoose.Schema({
   recipient: { type: String, required: true },
   agency: { type: String, required: true },
   street: { type: String, required: true },
+  colonia: { type: String, required: true }, // Nuevo campo requerido
   postalCode: { type: String, required: true },
   city: { type: String, required: true },
   dimensions: { type: String, required: true },
@@ -106,7 +106,7 @@ app.post("/api/packages", async (req, res) => {
   try {
     console.log("Datos recibidos en el backend:", req.body);
 
-    const requiredFields = ["recipient", "agency", "street", "postalCode", "city", "dimensions", "weight", "quantity"];
+    const requiredFields = ["recipient", "agency", "street", "colonia", "postalCode", "city", "dimensions", "weight", "quantity"];
     for (const field of requiredFields) {
       if (!req.body[field]) {
         return res.status(400).json({ error: `El campo ${field} es obligatorio.` });
@@ -145,9 +145,9 @@ app.post("/api/packages/extended", async (req, res) => {
   try {
     console.log("Datos recibidos en /api/packages/extended:", req.body);
 
-    const { recipient, agency, street, postalCode, city, dimensions, weight, quantity, email, phone } = req.body;
+    const { recipient, agency, street, colonia, postalCode, city, dimensions, weight, quantity, email, phone } = req.body;
 
-    const requiredFields = ["recipient", "agency", "street", "postalCode", "city", "dimensions", "weight", "quantity"];
+    const requiredFields = ["recipient", "agency", "street", "colonia", "postalCode", "city", "dimensions", "weight", "quantity"];
     for (const field of requiredFields) {
       if (!req.body[field]) {
         return res.status(400).json({ error: `El campo ${field} es obligatorio.` });
@@ -162,6 +162,7 @@ app.post("/api/packages/extended", async (req, res) => {
       recipient,
       agency,
       street,
+      colonia,
       postalCode,
       city,
       dimensions,
@@ -217,3 +218,4 @@ if (process.env.NODE_ENV === "production") {
 
 // Iniciar el servidor
 app.listen(PORT, () => console.log(`Servidor corriendo en el puerto ${PORT}`));
+

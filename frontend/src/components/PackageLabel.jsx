@@ -38,6 +38,7 @@ const PackageLabel = ({ packageData }) => {
     { label: "DESTINATARIO", value: packageData.recipient },
     { label: "AGENCIA", value: packageData.agency },
     { label: "CALLE Y NÚMERO", value: packageData.street },
+    { label: "COLONIA", value: packageData.colonia }, // Nuevo campo
     { label: "CÓDIGO POSTAL", value: packageData.postalCode },
     { label: "CIUDAD", value: packageData.city },
     { label: "DIMENSIONES", value: packageData.dimensions },
@@ -89,11 +90,19 @@ const PackageLabel = ({ packageData }) => {
   return (
     <div style={{ padding: "20px", maxWidth: "600px", margin: "0 auto" }}>
       <h2 style={{ textAlign: "center", color: "#2c3e50" }}>Etiqueta Generada</h2>
-
       <div style={{ backgroundColor: "#f8f9fa", padding: "15px", borderRadius: "8px" }}>
         {fields.map(({ label, value }) => (
-          <p key={label} style={{ margin: "8px 0" }}>
-            <strong>{label}:</strong> {typeof value === "string" ? value.toUpperCase() : value}
+          <p
+            key={label}
+            style={{
+              margin: "8px 0",
+              wordBreak: "break-word",
+              whiteSpace: "pre-line",
+              fontSize: "1em",
+              maxWidth: "100%",
+            }}
+          >
+            <strong>{label}:</strong> {typeof value === "string" ? value : value}
           </p>
         ))}
 
