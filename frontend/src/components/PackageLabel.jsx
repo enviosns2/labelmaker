@@ -37,15 +37,17 @@ const PackageLabel = ({ packageData }) => {
   const fields = [
     { label: "DESTINATARIO", value: packageData.recipient },
     { label: "AGENCIA", value: packageData.agency },
+    { label: "CORREO ELECTRÓNICO", value: packageData.email },
+    { label: "TELÉFONO", value: packageData.phone }, // Añadido el número telefónico
+    { label: "PAÍS DESTINO", value: packageData.destinationCountry },
+    { label: "ESTADO", value: packageData.city },
     { label: "CALLE Y NÚMERO", value: packageData.street },
     { label: "COLONIA", value: packageData.colonia },
     { label: "CÓDIGO POSTAL", value: packageData.postalCode },
-    { label: "CIUDAD", value: packageData.city },
     { label: "DIMENSIONES", value: packageData.dimensions },
     { label: "PESO", value: `${packageData.weight} LB` },
     { label: "CANTIDAD", value: packageData.quantity },
     { label: "CÓDIGO ÚNICO", value: uniqueCode },
-    { label: "PAÍS DESTINO", value: packageData.destinationCountry },
   ];
 
   const handleGeneratePDF = () => {
