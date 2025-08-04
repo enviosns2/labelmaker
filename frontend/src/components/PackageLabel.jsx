@@ -89,7 +89,7 @@ const PackageLabel = ({ packageData }) => {
 
   return (
     <div style={{ padding: "20px", maxWidth: "600px", margin: "0 auto" }}>
-      <h2 style={{ textAlign: "center", color: "#2c3e50" }}>Etiqueta Generada</h2>
+      <h2 style={{ textAlign: "center", color: "#2c3e50" }}>Etiqueta Oficial</h2>
       <div style={{ backgroundColor: "#f8f9fa", padding: "15px", borderRadius: "8px" }}>
         {fields.map(({ label, value }) => (
           <p
