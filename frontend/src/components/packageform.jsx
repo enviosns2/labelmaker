@@ -27,10 +27,57 @@ const PackageForm = ({ onGenerateLabel }) => {
       ? "https://labelmaker.onrender.com/api/packages"
       : "http://localhost:3000/api/packages";
 
+ // Añadir mapeo de estados/entidades por país
+  const STATES = {
+    "Estados Unidos": [
+      "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Carolina del Norte", "Carolina del Sur",
+      "Colorado", "Connecticut", "Dakota del Norte", "Dakota del Sur", "Delaware", "Florida", "Georgia",
+      "Hawái", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Luisiana", "Maine",
+      "Maryland", "Massachusetts", "Míchigan", "Minnesota", "Misisipi", "Misuri", "Montana",
+      "Nebraska", "Nevada", "Nueva Hampshire", "Nueva Jersey", "Nuevo México", "Nueva York",
+      "Ohio", "Oklahoma", "Oregón", "Pensilvania", "Rhode Island", "Tennessee", "Texas", "Utah",
+      "Vermont", "Virginia", "Virginia Occidental", "Washington", "Wisconsin", "Wyoming",
+      "otro"
+    ],
+    "México": [
+      "Aguascalientes", "Baja California", "Baja California Sur", "Campeche", "Chiapas", "Chihuahua",
+      "Ciudad de México", "Coahuila", "Colima", "Durango", "Estado de México", "Guanajuato",
+      "Guerrero", "Hidalgo", "Jalisco", "Michoacán", "Morelos", "Nayarit", "Nuevo León", "Oaxaca",
+      "Puebla", "Querétaro", "Quintana Roo", "San Luis Potosí", "Sinaloa", "Sonora", "Tabasco",
+      "Tamaulipas", "Tlaxcala", "Veracruz", "Yucatán", "Zacatecas",
+      "otro"
+    ],
+    "Guatemala": [
+      "Alta Verapaz", "Baja Verapaz", "Chimaltenango", "Chiquimula", "El Progreso", "Escuintla",
+      "Guatemala", "Huehuetenango", "Izabal", "Jalapa", "Jutiapa", "Petén", "Quetzaltenango",
+      "Quiché", "Retalhuleu", "Sacatepéquez", "San Marcos", "Santa Rosa", "Sololá", "Suchitepéquez",
+      "Totonicapán", "Zacapa",
+      "otro"
+    ],
+    "El Salvador": [
+      "Ahuachapán", "Cabañas", "Chalatenango", "Cuscatlán", "La Libertad", "La Paz", "La Unión",
+      "Morazán", "San Miguel", "San Salvador", "San Vicente", "Santa Ana", "Sonsonate", "Usulután",
+      "otro"
+    ],
+  };
+
   const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    // Si cambia el país, reiniciamos el estado/ciudad seleccionado y customCity
+    if (name === "destinationCountry") {
+      setFormData((prev) => ({
+        ...prev,
+        destinationCountry: value,
+        city: "",
+        customCity: "",
+      }));
+      return;
+    }
+
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
   };
 
@@ -219,12 +266,16 @@ const PackageForm = ({ onGenerateLabel }) => {
             value={formData.city}
             onChange={handleChange}
             required
+            disabled={!formData.destinationCountry} // deshabilitado hasta elegir país
           >
-            <option value="">Selecciona una opción</option>
-            <option value="Jalisco">Jalisco</option>
-            <option value="Michoacán">Michoacán</option>
-            <option value="Guanajuato">Guanajuato</option>
-            <option value="otro">Otro</option>
+            <option value="">{formData.destinationCountry ? "Selecciona una opción" : "Selecciona un país primero"}</option>
+            {/* Mostrar solo los estados del país seleccionado */}
+            {formData.destinationCountry &&
+              STATES[formData.destinationCountry]?.map((st) => (
+                <option key={st} value={st === "otro" ? "otro" : st}>
+                  {st === "otro" ? "Otro" : st}
+                </option>
+              ))}
           </select>
         </label>
         {formData.city === "otro" && (
