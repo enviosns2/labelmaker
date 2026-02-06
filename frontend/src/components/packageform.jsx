@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 
 const PackageForm = ({ onGenerateLabel }) => {
@@ -27,36 +27,36 @@ const PackageForm = ({ onGenerateLabel }) => {
       ? "https://labelmaker.onrender.com/api/packages"
       : "http://localhost:3000/api/packages";
 
- // AÃ±adir mapeo de estados/entidades por paÃ­s
+ // Añadir mapeo de estados/entidades por país
   const STATES = {
     "Estados Unidos": [
       "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Carolina del Norte", "Carolina del Sur",
       "Colorado", "Connecticut", "Dakota del Norte", "Dakota del Sur", "Delaware", "Florida", "Georgia",
-      "HawÃ¡i", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Luisiana", "Maine",
-      "Maryland", "Massachusetts", "MÃ­chigan", "Minnesota", "Misisipi", "Misuri", "Montana",
-      "Nebraska", "Nevada", "Nueva Hampshire", "Nueva Jersey", "Nuevo MÃ©xico", "Nueva York",
-      "Ohio", "Oklahoma", "OregÃ³n", "Pensilvania", "Rhode Island", "Tennessee", "Texas", "Utah",
+      "Hawái", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Luisiana", "Maine",
+      "Maryland", "Massachusetts", "Míchigan", "Minnesota", "Misisipi", "Misuri", "Montana",
+      "Nebraska", "Nevada", "Nueva Hampshire", "Nueva Jersey", "Nuevo México", "Nueva York",
+      "Ohio", "Oklahoma", "Oregón", "Pensilvania", "Rhode Island", "Tennessee", "Texas", "Utah",
       "Vermont", "Virginia", "Virginia Occidental", "Washington", "Wisconsin", "Wyoming",
       "otro"
     ],
-    "MÃ©xico": [
+    "México": [
       "Aguascalientes", "Baja California", "Baja California Sur", "Campeche", "Chiapas", "Chihuahua",
-      "Ciudad de MÃ©xico", "Coahuila", "Colima", "Durango", "Estado de MÃ©xico", "Guanajuato",
-      "Guerrero", "Hidalgo", "Jalisco", "MichoacÃ¡n", "Morelos", "Nayarit", "Nuevo LeÃ³n", "Oaxaca",
-      "Puebla", "QuerÃ©taro", "Quintana Roo", "San Luis PotosÃ­", "Sinaloa", "Sonora", "Tabasco",
-      "Tamaulipas", "Tlaxcala", "Veracruz", "YucatÃ¡n", "Zacatecas",
+      "Ciudad de México", "Coahuila", "Colima", "Durango", "Estado de México", "Guanajuato",
+      "Guerrero", "Hidalgo", "Jalisco", "Michoacán", "Morelos", "Nayarit", "Nuevo León", "Oaxaca",
+      "Puebla", "Querétaro", "Quintana Roo", "San Luis Potosí", "Sinaloa", "Sonora", "Tabasco",
+      "Tamaulipas", "Tlaxcala", "Veracruz", "Yucatán", "Zacatecas",
       "otro"
     ],
     "Guatemala": [
       "Alta Verapaz", "Baja Verapaz", "Chimaltenango", "Chiquimula", "El Progreso", "Escuintla",
-      "Guatemala", "Huehuetenango", "Izabal", "Jalapa", "Jutiapa", "PetÃ©n", "Quetzaltenango",
-      "QuichÃ©", "Retalhuleu", "SacatepÃ©quez", "San Marcos", "Santa Rosa", "SololÃ¡", "SuchitepÃ©quez",
-      "TotonicapÃ¡n", "Zacapa",
+      "Guatemala", "Huehuetenango", "Izabal", "Jalapa", "Jutiapa", "Petén", "Quetzaltenango",
+      "Quiché", "Retalhuleu", "Sacatepéquez", "San Marcos", "Santa Rosa", "Sololá", "Suchitepéquez",
+      "Totonicapán", "Zacapa",
       "otro"
     ],
     "El Salvador": [
-      "AhuachapÃ¡n", "CabaÃ±as", "Chalatenango", "CuscatlÃ¡n", "La Libertad", "La Paz", "La UniÃ³n",
-      "MorazÃ¡n", "San Miguel", "San Salvador", "San Vicente", "Santa Ana", "Sonsonate", "UsulutÃ¡n",
+      "Ahuachapán", "Cabañas", "Chalatenango", "Cuscatlán", "La Libertad", "La Paz", "La Unión",
+      "Morazán", "San Miguel", "San Salvador", "San Vicente", "Santa Ana", "Sonsonate", "Usulután",
       "otro"
     ],
   };
@@ -64,7 +64,7 @@ const PackageForm = ({ onGenerateLabel }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Si cambia el paÃ­s, reiniciamos el estado/ciudad seleccionado y customCity
+    // Si cambia el país, reiniciamos el estado/ciudad seleccionado y customCity
     if (name === "destinationCountry") {
       setFormData((prev) => ({
         ...prev,
@@ -168,17 +168,17 @@ const PackageForm = ({ onGenerateLabel }) => {
 
     try {
       const response = await axios.post(API_URL, packageData);
-      console.log("âœ… Respuesta del servidor:", response.data);
+      console.log("✅ Respuesta del servidor:", response.data);
 
       if (response.data && response.data.paquete_id) {
-        setStatusMessage("Paquete guardado con Ã©xito.");
+        setStatusMessage("Paquete guardado con éxito.");
         onGenerateLabel(response.data);
         resetForm();
       } else {
         setStatusMessage("Error: La respuesta del servidor no contiene un paquete_id.");
       }
     } catch (error) {
-      console.error("âŒ Error al guardar el paquete:", error.response || error.message);
+      console.error("❌ Error al guardar el paquete:", error.response || error.message);
       setStatusMessage("Error al guardar el paquete. Intenta nuevamente.");
     } finally {
       setIsSubmitting(false);
@@ -218,41 +218,41 @@ const PackageForm = ({ onGenerateLabel }) => {
       </div>
       <div>
         <label>
-          Correo electrÃ³nico:
+          Correo electrónico:
           <input
             type="email"
             name="email"
             value={formData.email}
             onChange={handleChange}
-            placeholder="Correo electrÃ³nico"
+            placeholder="Correo electrónico"
             required
           />
         </label>
       </div>
       <div>
         <label>
-          TelÃ©fono:
+          Teléfono:
           <input
             type="tel"
             name="phone"
             value={formData.phone}
             onChange={handleChange}
-            placeholder="NÃºmero telefÃ³nico"
+            placeholder="Número telefónico"
           />
         </label>
       </div>
       <div>
         <label>
-          PaÃ­s destino:
+          País destino:
           <select
             name="destinationCountry"
             value={formData.destinationCountry}
             onChange={handleChange}
             required
           >
-            <option value="">Selecciona un paÃ­s</option>
+            <option value="">Selecciona un país</option>
             <option value="Estados Unidos">Estados Unidos</option>
-            <option value="MÃ©xico">MÃ©xico</option>
+            <option value="México">México</option>
             <option value="Guatemala">Guatemala</option>
             <option value="El Salvador">El Salvador</option>
           </select>
@@ -266,10 +266,10 @@ const PackageForm = ({ onGenerateLabel }) => {
             value={formData.city}
             onChange={handleChange}
             required
-            disabled={!formData.destinationCountry} // deshabilitado hasta elegir paÃ­s
+            disabled={!formData.destinationCountry} // deshabilitado hasta elegir país
           >
-            <option value="">{formData.destinationCountry ? "Selecciona una opciÃ³n" : "Selecciona un paÃ­s primero"}</option>
-            {/* Mostrar solo los estados del paÃ­s seleccionado */}
+            <option value="">{formData.destinationCountry ? "Selecciona una opción" : "Selecciona un país primero"}</option>
+            {/* Mostrar solo los estados del país seleccionado */}
             {formData.destinationCountry &&
               STATES[formData.destinationCountry]?.map((st) => (
                 <option key={st} value={st === "otro" ? "otro" : st}>
@@ -292,13 +292,13 @@ const PackageForm = ({ onGenerateLabel }) => {
       </div>
       <div>
         <label>
-          Calle y nÃºmero:
+          Calle y número:
           <input
             type="text"
             name="street"
             value={formData.street}
             onChange={handleChange}
-            placeholder="Calle y nÃºmero"
+            placeholder="Calle y número"
             required
           />
         </label>
@@ -318,13 +318,13 @@ const PackageForm = ({ onGenerateLabel }) => {
       </div>
       <div>
         <label>
-          CÃ³digo postal:
+          Código postal:
           <input
             type="text"
             name="postalCode"
             value={formData.postalCode}
             onChange={handleChange}
-            placeholder="CÃ³digo postal"
+            placeholder="Código postal"
             required
           />
         </label>
@@ -338,7 +338,7 @@ const PackageForm = ({ onGenerateLabel }) => {
             onChange={handleChange}
             required
           >
-            <option value="">Selecciona una opciÃ³n</option>
+            <option value="">Selecciona una opción</option>
             <option value="14x14x14">14x14x14</option>
             <option value="16x16x16">16x16x16</option>
             <option value="18x18x18">18x18x18</option>
@@ -412,4 +412,3 @@ const PackageForm = ({ onGenerateLabel }) => {
 };
 
 export default PackageForm;
-
