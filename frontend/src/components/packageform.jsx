@@ -3,90 +3,49 @@ import axios from "axios";
 
 const PackageForm = ({ onGenerateLabel }) => {
   const [formData, setFormData] = useState({
-    recipient: "",
-    agency: "",
+    sender: "",
     street: "",
-    colonia: "", // Nuevo campo
     postalCode: "",
     city: "",
     customCity: "",
     dimensions: "",
     customDimensions: "",
     weight: "",
-    quantity: "",
-    email: "",
-    phone: "",
-    destinationCountry: "", // Nuevo campo
+    quantity: "", // Campo para cantidad
   });
 
-  const [statusMessage, setStatusMessage] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
+  // URL del backend desplegado en Render
   const API_URL =
-    process.env.NODE_ENV === "production"
-      ? "https://labelmaker.onrender.com/api/packages"
-      : "http://localhost:3000/api/packages";
+  process.env.NODE_ENV === "production"
+    ? "/api/packages"
+    : "http://localhost:3000/api/packages";
 
- // Añadir mapeo de estados/entidades por país
-  const STATES = {
-    "Estados Unidos": [
-      "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Carolina del Norte", "Carolina del Sur",
-      "Colorado", "Connecticut", "Dakota del Norte", "Dakota del Sur", "Delaware", "Florida", "Georgia",
-      "Hawái", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Luisiana", "Maine",
-      "Maryland", "Massachusetts", "Míchigan", "Minnesota", "Misisipi", "Misuri", "Montana",
-      "Nebraska", "Nevada", "Nueva Hampshire", "Nueva Jersey", "Nuevo México", "Nueva York",
-      "Ohio", "Oklahoma", "Oregón", "Pensilvania", "Rhode Island", "Tennessee", "Texas", "Utah",
-      "Vermont", "Virginia", "Virginia Occidental", "Washington", "Wisconsin", "Wyoming",
-      "otro"
-    ],
-    "México": [
-      "Aguascalientes", "Baja California", "Baja California Sur", "Campeche", "Chiapas", "Chihuahua",
-      "Ciudad de México", "Coahuila", "Colima", "Durango", "Estado de México", "Guanajuato",
-      "Guerrero", "Hidalgo", "Jalisco", "Michoacán", "Morelos", "Nayarit", "Nuevo León", "Oaxaca",
-      "Puebla", "Querétaro", "Quintana Roo", "San Luis Potosí", "Sinaloa", "Sonora", "Tabasco",
-      "Tamaulipas", "Tlaxcala", "Veracruz", "Yucatán", "Zacatecas",
-      "otro"
-    ],
-    "Guatemala": [
-      "Alta Verapaz", "Baja Verapaz", "Chimaltenango", "Chiquimula", "El Progreso", "Escuintla",
-      "Guatemala", "Huehuetenango", "Izabal", "Jalapa", "Jutiapa", "Petén", "Quetzaltenango",
-      "Quiché", "Retalhuleu", "Sacatepéquez", "San Marcos", "Santa Rosa", "Sololá", "Suchitepéquez",
-      "Totonicapán", "Zacapa",
-      "otro"
-    ],
-    "El Salvador": [
-      "Ahuachapán", "Cabañas", "Chalatenango", "Cuscatlán", "La Libertad", "La Paz", "La Unión",
-      "Morazán", "San Miguel", "San Salvador", "San Vicente", "Santa Ana", "Sonsonate", "Usulután",
-      "otro"
-    ],
-  };
-
+  // Maneja los cambios en los campos del formulario
   const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    // Si cambia el país, reiniciamos el estado/ciudad seleccionado y customCity
-    if (name === "destinationCountry") {
-      setFormData((prev) => ({
-        ...prev,
-        destinationCountry: value,
-        city: "",
-        customCity: "",
-      }));
-      return;
-    }
-
     setFormData({
       ...formData,
-      [name]: value,
+      [e.target.name]: e.target.value,
     });
   };
 
+  // Genera un código único basado en los datos del formulario
+  const generateUniqueCode = (data) => {
+    const timestamp = Date.now().toString(36); // Marca de tiempo en base 36
+    const clientPrefix = data.sender.slice(0, 3).toUpperCase(); // Primeras 3 letras del remitente
+    const cityPrefix =
+      data.city === "otro"
+        ? data.customCity.slice(0, 3).toUpperCase() // Ciudad personalizada
+        : data.city.slice(0, 3).toUpperCase(); // Ciudad seleccionada
+    const randomString = Math.random().toString(36).substring(2, 6).toUpperCase(); // Cadena aleatoria
+
+    return `${clientPrefix}-${cityPrefix}-${timestamp}-${randomString}`;
+  };
+
+  // Limpia los datos del formulario
   const resetForm = () => {
     setFormData({
-      recipient: "",
-      agency: "",
+      sender: "",
       street: "",
-      colonia: "",
       postalCode: "",
       city: "",
       customCity: "",
@@ -94,19 +53,14 @@ const PackageForm = ({ onGenerateLabel }) => {
       customDimensions: "",
       weight: "",
       quantity: "",
-      email: "",
-      phone: "",
-      destinationCountry: "", // Nuevo campo
     });
-    setStatusMessage("");
   };
 
+  // Validación de campos obligatorios
   const isFormValid = () => {
     const {
-      recipient,
-      agency,
+      sender,
       street,
-      colonia,
       postalCode,
       city,
       customCity,
@@ -114,74 +68,60 @@ const PackageForm = ({ onGenerateLabel }) => {
       customDimensions,
       weight,
       quantity,
-      email,
-      phone,
-      destinationCountry,
     } = formData;
 
     return (
-      recipient &&
-      agency &&
+      sender &&
       street &&
-      colonia &&
       postalCode &&
       weight &&
       quantity &&
-      email &&
       (city !== "otro" || customCity) &&
-      (dimensions !== "otro" || customDimensions) &&
-      destinationCountry
+      (dimensions !== "otro" || customDimensions)
     );
   };
 
+  // Maneja el envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!isFormValid()) {
-      setStatusMessage("Por favor, completa todos los campos obligatorios.");
+      alert("Por favor, completa todos los campos.");
       return;
     }
 
+    const uniqueCode = generateUniqueCode(formData);
+
+    // Construir el paquete con los datos del formulario
     const packageData = {
-      recipient: formData.recipient,
-      agency: formData.agency,
+      paquete_id: uniqueCode,
+      uniqueCode,
+      sender: formData.sender,
       street: formData.street,
-      colonia: formData.colonia,
       postalCode: formData.postalCode,
-      city:
-        formData.city === "otro"
-          ? formData.customCity
-          : formData.city,
+      city: formData.city === "otro" ? formData.customCity : formData.city,
       dimensions:
         formData.dimensions === "otro"
           ? formData.customDimensions
           : formData.dimensions,
       weight: formData.weight,
       quantity: formData.quantity,
-      email: formData.email,
-      phone: formData.phone,
-      destinationCountry: formData.destinationCountry,
     };
 
-    setStatusMessage("Enviando datos...");
-    setIsSubmitting(true);
+    // Mostrar la etiqueta en el frontend
+    onGenerateLabel(packageData);
 
+    // Enviar los datos al backend
     try {
       const response = await axios.post(API_URL, packageData);
-      console.log("✅ Respuesta del servidor:", response.data);
-
-      if (response.data && response.data.paquete_id) {
-        setStatusMessage("Paquete guardado con éxito.");
-        onGenerateLabel(response.data);
-        resetForm();
-      } else {
-        setStatusMessage("Error: La respuesta del servidor no contiene un paquete_id.");
-      }
+      console.log("Paquete guardado en la base de datos:", response.data);
+      alert("Paquete guardado con éxito.");
+      resetForm();
     } catch (error) {
-      console.error("❌ Error al guardar el paquete:", error.response || error.message);
-      setStatusMessage("Error al guardar el paquete. Intenta nuevamente.");
-    } finally {
-      setIsSubmitting(false);
+      console.error("Error al guardar el paquete:", error);
+      alert(
+        "Hubo un error al intentar guardar el paquete. Por favor, intenta nuevamente."
+      );
     }
   };
 
@@ -190,105 +130,19 @@ const PackageForm = ({ onGenerateLabel }) => {
       onSubmit={handleSubmit}
       style={{ display: "flex", flexDirection: "column", gap: "10px" }}
     >
+      {/* Campos del formulario */}
       <div>
         <label>
-          Destinatario:
+          Remitente:
           <input
             type="text"
-            name="recipient"
-            value={formData.recipient}
+            name="sender"
+            value={formData.sender}
             onChange={handleChange}
-            placeholder="Nombre del destinatario"
+            placeholder="Nombre del remitente"
             required
           />
         </label>
-      </div>
-      <div>
-        <label>
-          Agencia:
-          <input
-            type="text"
-            name="agency"
-            value={formData.agency}
-            onChange={handleChange}
-            placeholder="Nombre de la agencia"
-            required
-          />
-        </label>
-      </div>
-      <div>
-        <label>
-          Correo electrónico:
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="Correo electrónico"
-            required
-          />
-        </label>
-      </div>
-      <div>
-        <label>
-          Teléfono:
-          <input
-            type="tel"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            placeholder="Número telefónico"
-          />
-        </label>
-      </div>
-      <div>
-        <label>
-          País destino:
-          <select
-            name="destinationCountry"
-            value={formData.destinationCountry}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Selecciona un país</option>
-            <option value="Estados Unidos">Estados Unidos</option>
-            <option value="México">México</option>
-            <option value="Guatemala">Guatemala</option>
-            <option value="El Salvador">El Salvador</option>
-          </select>
-        </label>
-      </div>
-      <div>
-        <label>
-          Estado:
-          <select
-            name="city"
-            value={formData.city}
-            onChange={handleChange}
-            required
-            disabled={!formData.destinationCountry} // deshabilitado hasta elegir país
-          >
-            <option value="">{formData.destinationCountry ? "Selecciona una opción" : "Selecciona un país primero"}</option>
-            {/* Mostrar solo los estados del país seleccionado */}
-            {formData.destinationCountry &&
-              STATES[formData.destinationCountry]?.map((st) => (
-                <option key={st} value={st === "otro" ? "otro" : st}>
-                  {st === "otro" ? "Otro" : st}
-                </option>
-              ))}
-          </select>
-        </label>
-        {formData.city === "otro" && (
-          <input
-            type="text"
-            name="customCity"
-            value={formData.customCity}
-            onChange={handleChange}
-            placeholder="Especifica la ciudad"
-            style={{ marginTop: "5px" }}
-            required
-          />
-        )}
       </div>
       <div>
         <label>
@@ -305,19 +159,6 @@ const PackageForm = ({ onGenerateLabel }) => {
       </div>
       <div>
         <label>
-          Colonia:
-          <input
-            type="text"
-            name="colonia"
-            value={formData.colonia}
-            onChange={handleChange}
-            placeholder="Colonia"
-            required
-          />
-        </label>
-      </div>
-      <div>
-        <label>
           Código postal:
           <input
             type="text"
@@ -328,6 +169,34 @@ const PackageForm = ({ onGenerateLabel }) => {
             required
           />
         </label>
+      </div>
+      <div>
+        <label>
+          Ciudad:
+          <select
+            name="city"
+            value={formData.city}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Selecciona una opción</option>
+            <option value="Jalisco">Jalisco</option>
+            <option value="Michoacán">Michoacán</option>
+            <option value="Guanajuato">Guanajuato</option>
+            <option value="otro">Otro</option>
+          </select>
+        </label>
+        {formData.city === "otro" && (
+          <input
+            type="text"
+            name="customCity"
+            value={formData.customCity}
+            onChange={handleChange}
+            placeholder="Especifica la ciudad"
+            style={{ marginTop: "5px" }}
+            required
+          />
+        )}
       </div>
       <div>
         <label>
@@ -349,6 +218,7 @@ const PackageForm = ({ onGenerateLabel }) => {
             <option value="24x24x30">24x24x30</option>
             <option value="27x27x27">27x27x27</option>
             <option value="30x30x30">30x30x30</option>
+            <option value="28x28x34">28x28x34</option>
             <option value="otro">Otro</option>
           </select>
         </label>
@@ -390,22 +260,9 @@ const PackageForm = ({ onGenerateLabel }) => {
           />
         </label>
       </div>
-      <button
-        type="submit"
-        style={{
-          marginTop: "10px",
-          backgroundColor: "#014235",
-          color: "#fff",
-          border: "none",
-          padding: "10px 20px",
-          borderRadius: "4px",
-          cursor: "pointer",
-        }}
-        disabled={isSubmitting}
-      >
-        {isSubmitting ? "Enviando..." : "Generar Etiqueta"}
+      <button type="submit" style={{ marginTop: "10px" }}>
+        Generar Etiqueta
       </button>
-      {statusMessage && <p>{statusMessage}</p>}
     </form>
   );
 };
