@@ -102,24 +102,38 @@ const PackageLabel = ({ packageData }) => {
     win.document.write(`
       <style>
         @page {
-          margin: 0; /* Eliminar márgenes de impresión */
+          margin: 10mm;
+          size: A4;
         }
         body {
           margin: 0;
+          padding: 10px;
           font-family: Arial, sans-serif;
+          font-size: 14px;
         }
         p {
           margin: 8px 0;
+          line-height: 1.4;
         }
         .barcode {
           margin: 20px 0;
           text-align: center;
         }
+        h2 {
+          margin: 10px 0;
+          font-size: 18px;
+        }
+        @media print {
+          body {
+            padding: 0;
+            margin: 0;
+          }
+        }
       </style>
     `);
     win.document.write("</head><body>");
     win.document.write(printContents);
-    win.document.write(barcodeImageHTML); // Agregar la imagen del código de barras
+    win.document.write(barcodeImageHTML);
     win.document.write("</body></html>");
     win.document.close();
     win.focus();
@@ -129,58 +143,142 @@ const PackageLabel = ({ packageData }) => {
     }, 500);
   };
 
+  // Estilos optimizados para móvil
+  const labelStyles = {
+    container: {
+      padding: "0 1rem 1rem 1rem",
+      width: "100%",
+      boxSizing: "border-box",
+    },
+    title: {
+      textAlign: "center",
+      color: "#2c3e50",
+      fontSize: "1.3rem",
+      marginBottom: "1rem",
+      fontWeight: "bold",
+      margin: "0 0 1rem 0",
+    },
+    labelBox: {
+      backgroundColor: "#f8f9fa",
+      padding: "1.25rem",
+      borderRadius: "8px",
+      maxWidth: "100%",
+      boxSizing: "border-box",
+      width: "100%",
+    },
+    fieldLabel: {
+      fontWeight: "bold",
+      color: "#333",
+      marginRight: "0.5rem",
+    },
+    fieldValue: {
+      color: "#666",
+      wordBreak: "break-word",
+      whiteSpace: "pre-line",
+    },
+    fieldItem: {
+      margin: "10px 0",
+      fontSize: "0.95rem",
+      lineHeight: "1.4",
+      wordBreak: "break-word",
+    },
+    barcodeSection: {
+      margin: "20px 0 0 0",
+      textAlign: "center",
+      paddingTop: "15px",
+      borderTop: "1px solid #ddd",
+    },
+    barcodeSectionTitle: {
+      fontWeight: "bold",
+      marginBottom: "10px",
+      fontSize: "0.9rem",
+      margin: "0 0 10px 0",
+    },
+    barcodeCode: {
+      fontSize: "1.1rem",
+      letterSpacing: "2px",
+      margin: "10px 0",
+      fontFamily: "monospace",
+      padding: "10px",
+      backgroundColor: "#fff",
+      borderRadius: "4px",
+      border: "1px solid #ddd",
+      wordBreak: "break-all",
+    },
+    barcodeCanvas: {
+      maxWidth: "100%",
+      height: "auto",
+      display: "block",
+    },
+    buttonContainer: {
+      display: "flex",
+      gap: "10px",
+      justifyContent: "center",
+      marginTop: "15px",
+      flexWrap: "wrap",
+      padding: "0 1rem",
+      boxSizing: "border-box",
+    },
+    button: {
+      padding: "12px 20px",
+      color: "white",
+      border: "none",
+      borderRadius: "6px",
+      cursor: "pointer",
+      fontSize: "0.95rem",
+      fontWeight: "600",
+      minHeight: "44px",
+      minWidth: "44px",
+      transition: "all 0.3s ease",
+      flex: "1 1 calc(50% - 5px)",
+    },
+    pdfButton: {
+      backgroundColor: "#3498db",
+    },
+    printButton: {
+      backgroundColor: "#27ae60",
+    },
+  };
+
   return (
-    <div>
-      <div id="print-label" style={{ padding: "20px", maxWidth: "600px", margin: "0 auto" }}>
-        <h2 style={{ textAlign: "center", color: "#2c3e50" }}>Etiqueta Oficial</h2>
-        <div style={{ backgroundColor: "#f8f9fa", padding: "15px", borderRadius: "8px" }}>
+    <div style={labelStyles.container}>
+      <div id="print-label" style={labelStyles.labelBox}>
+        <h2 style={labelStyles.title}>Etiqueta Oficial</h2>
+        <div>
           {fields.map(({ label, value }) => (
             <p
               key={label}
-              style={{
-                margin: "8px 0",
-                wordBreak: "break-word",
-                whiteSpace: "pre-line",
-                fontSize: "1em",
-                maxWidth: "100%",
-              }}
+              style={labelStyles.fieldItem}
             >
-              <strong>{label}:</strong> {typeof value === "string" ? value : value}
+              <span style={labelStyles.fieldLabel}>{label}:</span>
+              <span style={labelStyles.fieldValue}> {typeof value === "string" ? value : value}</span>
             </p>
           ))}
-          <div className="barcode" style={{ margin: "20px 0", textAlign: "center" }}>
-            <p style={{ fontWeight: "bold", marginBottom: "10px" }}>Identificador único:</p>
-            <div style={{ fontSize: "1.2em", letterSpacing: "2px", margin: "10px 0" }}>{uniqueCode}</div>
-            <canvas ref={barcodeCanvasRef} style={{ maxWidth: "100%" }}></canvas>
+          <div style={labelStyles.barcodeSection}>
+            <p style={labelStyles.barcodeSectionTitle}>Identificador único:</p>
+            <div style={labelStyles.barcodeCode}>{uniqueCode}</div>
+            <canvas ref={barcodeCanvasRef} style={labelStyles.barcodeCanvas}></canvas>
           </div>
         </div>
       </div>
-      <div style={{ display: "flex", gap: "10px", justifyContent: "center", marginTop: "10px" }}>
+      <div style={labelStyles.buttonContainer}>
         <button
           onClick={handleGeneratePDF}
           style={{
-            padding: "10px 20px",
-            backgroundColor: "#3498db",
-            color: "white",
-            border: "none",
-            borderRadius: "5px",
-            cursor: "pointer",
+            ...labelStyles.button,
+            ...labelStyles.pdfButton,
           }}
         >
-          Descargar PDF
+          📥 Descargar PDF
         </button>
         <button
           onClick={handlePrint}
           style={{
-            padding: "10px 20px",
-            backgroundColor: "#27ae60",
-            color: "white",
-            border: "none",
-            borderRadius: "5px",
-            cursor: "pointer",
+            ...labelStyles.button,
+            ...labelStyles.printButton,
           }}
         >
-          Imprimir
+          🖨️ Imprimir
         </button>
       </div>
     </div>

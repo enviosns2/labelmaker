@@ -1,8 +1,38 @@
+/* Animación de fade in para transiciones entre pestañas */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
 #root {
-  max-width: 1280px;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 0;
   text-align: center;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
 /* Contenedor principal */
@@ -26,17 +56,153 @@
   max-width: 50%;
 }
 
-/* Ajustes responsivos */
-@media (max-width: 768px) {
-  .container {
-    flex-direction: column;
-    align-items: center;
+/* Inputs y selects optimizados para móvil */
+input,
+select,
+textarea {
+  font-size: 16px; /* Previene zoom automático en iOS */
+  border-radius: 6px;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: white;
+}
+
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 30px;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #014235;
+  box-shadow: 0 0 0 3px rgba(1, 66, 53, 0.1);
+}
+
+/* Botones optimizados para móvil */
+button {
+  font-size: 16px;
+  min-height: 44px; /* Apple's recommended touch target size */
+  min-width: 44px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Ajustes responsivos - MOBILE FIRST */
+@media (max-width: 480px) {
+  .App {
+    padding: 0;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    width: 100% !important;
+    padding: 12px 14px;
+    font-size: 16px;
+    margin: 8px 0;
+    display: block;
+    box-sizing: border-box;
+  }
+
+  select {
+    padding: 12px 30px 12px 14px !important;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    text-align: left;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+    padding: 0 0.5rem;
+  }
+
+  h2 {
+    font-size: 1.2rem;
+    margin: 0.5rem 0;
   }
 
   .form,
   .label {
     max-width: 100%;
     width: 100%;
+    padding: 0 1rem;
+  }
+
+  /* Asegurar que los botones en móvil sean siempre accesibles */
+  button {
+    min-height: 48px;
+    min-width: 48px;
+  }
+
+  /* Espaciado mejorado para móvil */
+  p {
+    margin: 8px 0;
+    padding: 0 0.5rem;
+  }
+
+  /* Evitar que los input sean demasiado pequeños  */
+  input[type="number"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="text"] {
+    height: 44px;
+  }
+}
+
+/* Tablets pequeñas */
+@media (min-width: 481px) and (max-width: 768px) {
+  input,
+  select,
+  textarea {
+    max-width: 100%;
+  }
+
+  button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .form,
+  .label {
+    max-width: 100%;
+    width: 100%;
+    padding: 1rem;
+  }
+
+  .container {
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .form {
@@ -44,13 +210,39 @@
   }
 }
 
+/* Desktop */
+@media (min-width: 769px) {
+  .container {
+    flex-direction: row;
+  }
+
+  .form,
+  .label {
+    max-width: 50%;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    max-width: 400px;
+  }
+
+  button:hover:not(:disabled) {
+    background-color: #333;
+  }
+}
+
 /* General input, select, button styles */
-input, select, button {
-  width: 100%;
-  max-width: 400px;
-  padding: 10px;
-  margin: 10px 0;
-  box-sizing: border-box;
+input,
+select,
+button {
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+}
+
+select {
+  padding: 10px 30px 10px 12px;
 }
 
 button {
@@ -59,10 +251,6 @@ button {
   border: none;
   cursor: pointer;
   padding: 10px;
-}
-
-button:hover {
-  background-color: #333;
 }
 
 /* Logo */

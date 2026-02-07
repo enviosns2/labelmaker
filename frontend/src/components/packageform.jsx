@@ -185,99 +185,155 @@ const PackageForm = ({ onGenerateLabel }) => {
     }
   };
 
+  const formStyles = {
+    container: {
+      display: "flex",
+      flexDirection: "column",
+      gap: "15px",
+      padding: "1rem 0",
+    },
+    fieldGroup: {
+      display: "flex",
+      flexDirection: "column",
+      gap: "6px",
+    },
+    label: {
+      fontWeight: 600,
+      fontSize: "0.95rem",
+      color: "#333",
+      display: "block",
+    },
+    input: {
+      width: "100%",
+      padding: "12px 10px",
+      fontSize: "16px",
+      border: "1px solid #ddd",
+      borderRadius: "6px",
+      boxSizing: "border-box",
+      transition: "border-color 0.3s ease",
+    },
+    select: {
+      width: "100%",
+      padding: "12px 10px",
+      fontSize: "16px",
+      border: "1px solid #ddd",
+      borderRadius: "6px",
+      boxSizing: "border-box",
+      backgroundColor: "white",
+      transition: "border-color 0.3s ease",
+    },
+    button: {
+      width: "100%",
+      marginTop: "15px",
+      backgroundColor: "#014235",
+      color: "#fff",
+      border: "none",
+      padding: "14px 20px",
+      borderRadius: "6px",
+      cursor: "pointer",
+      fontSize: "16px",
+      fontWeight: 600,
+      minHeight: "44px",
+      transition: "all 0.3s ease",
+      boxSizing: "border-box",
+    },
+    statusMessage: {
+      padding: "12px",
+      marginTop: "10px",
+      borderRadius: "6px",
+      fontSize: "0.95rem",
+      backgroundColor: "#e8f5e9",
+      color: "#2e7d32",
+      border: "1px solid #c8e6c9",
+    },
+  };
+
   return (
     <form
       onSubmit={handleSubmit}
-      style={{ display: "flex", flexDirection: "column", gap: "10px" }}
+      style={formStyles.container}
     >
-      <div>
-        <label>
-          Destinatario:
-          <input
-            type="text"
-            name="recipient"
-            value={formData.recipient}
-            onChange={handleChange}
-            placeholder="Nombre del destinatario"
-            required
-          />
-        </label>
+      <div style={formStyles.fieldGroup}>
+        <label style={formStyles.label}>Destinatario:</label>
+        <input
+          type="text"
+          name="recipient"
+          value={formData.recipient}
+          onChange={handleChange}
+          placeholder="Nombre del destinatario"
+          style={formStyles.input}
+          required
+        />
       </div>
-      <div>
-        <label>
-          Agencia:
-          <input
-            type="text"
-            name="agency"
-            value={formData.agency}
-            onChange={handleChange}
-            placeholder="Nombre de la agencia"
-            required
-          />
-        </label>
+      <div style={formStyles.fieldGroup}>
+        <label style={formStyles.label}>Agencia:</label>
+        <input
+          type="text"
+          name="agency"
+          value={formData.agency}
+          onChange={handleChange}
+          placeholder="Nombre de la agencia"
+          style={formStyles.input}
+          required
+        />
       </div>
-      <div>
-        <label>
-          Correo electrónico:
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="Correo electrónico"
-            required
-          />
-        </label>
+      <div style={formStyles.fieldGroup}>
+        <label style={formStyles.label}>Correo electrónico:</label>
+        <input
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          placeholder="Correo electrónico"
+          style={formStyles.input}
+          required
+        />
       </div>
-      <div>
-        <label>
-          Teléfono:
-          <input
-            type="tel"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            placeholder="Número telefónico"
-          />
-        </label>
+      <div style={formStyles.fieldGroup}>
+        <label style={formStyles.label}>Teléfono:</label>
+        <input
+          type="tel"
+          name="phone"
+          value={formData.phone}
+          onChange={handleChange}
+          placeholder="Número telefónico"
+          style={formStyles.input}
+        />
       </div>
-      <div>
-        <label>
-          País destino:
-          <select
-            name="destinationCountry"
-            value={formData.destinationCountry}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Selecciona un país</option>
-            <option value="Estados Unidos">Estados Unidos</option>
-            <option value="México">México</option>
-            <option value="Guatemala">Guatemala</option>
-            <option value="El Salvador">El Salvador</option>
-          </select>
-        </label>
+      <div style={formStyles.fieldGroup}>
+        <label style={formStyles.label}>País destino:</label>
+        <select
+          name="destinationCountry"
+          value={formData.destinationCountry}
+          onChange={handleChange}
+          style={formStyles.select}
+          required
+        >
+          <option value="">Selecciona un país</option>
+          <option value="Estados Unidos">Estados Unidos</option>
+          <option value="México">México</option>
+          <option value="Guatemala">Guatemala</option>
+          <option value="El Salvador">El Salvador</option>
+        </select>
       </div>
-      <div>
-        <label>
-          Estado:
-          <select
-            name="city"
-            value={formData.city}
-            onChange={handleChange}
-            required
-            disabled={!formData.destinationCountry} // deshabilitado hasta elegir país
-          >
-            <option value="">{formData.destinationCountry ? "Selecciona una opción" : "Selecciona un país primero"}</option>
-            {/* Mostrar solo los estados del país seleccionado */}
-            {formData.destinationCountry &&
-              STATES[formData.destinationCountry]?.map((st) => (
-                <option key={st} value={st === "otro" ? "otro" : st}>
-                  {st === "otro" ? "Otro" : st}
-                </option>
-              ))}
-          </select>
-        </label>
+      <div style={formStyles.fieldGroup}>
+        <label style={formStyles.label}>Estado:</label>
+        <select
+          name="city"
+          value={formData.city}
+          onChange={handleChange}
+          style={formStyles.select}
+          required
+          disabled={!formData.destinationCountry}
+        >
+          <option value="">{formData.destinationCountry ? "Selecciona una opción" : "Selecciona un país primero"}</option>
+          {formData.destinationCountry &&
+            STATES[formData.destinationCountry]?.map((st) => (
+              <option key={st} value={st === "otro" ? "otro" : st}>
+                {st === "otro" ? "Otro" : st}
+              </option>
+            ))}
+        </select>
         {formData.city === "otro" && (
           <input
             type="text"
@@ -285,73 +341,69 @@ const PackageForm = ({ onGenerateLabel }) => {
             value={formData.customCity}
             onChange={handleChange}
             placeholder="Especifica la ciudad"
-            style={{ marginTop: "5px" }}
+            style={{...formStyles.input, marginTop: "8px"}}
             required
           />
         )}
       </div>
-      <div>
-        <label>
-          Calle y número:
-          <input
-            type="text"
-            name="street"
-            value={formData.street}
-            onChange={handleChange}
-            placeholder="Calle y número"
-            required
-          />
-        </label>
+      <div style={formStyles.fieldGroup}>
+        <label style={formStyles.label}>Calle y número:</label>
+        <input
+          type="text"
+          name="street"
+          value={formData.street}
+          onChange={handleChange}
+          placeholder="Calle y número"
+          style={formStyles.input}
+          required
+        />
       </div>
-      <div>
-        <label>
-          Colonia:
-          <input
-            type="text"
-            name="colonia"
-            value={formData.colonia}
-            onChange={handleChange}
-            placeholder="Colonia"
-            required
-          />
-        </label>
+      <div style={formStyles.fieldGroup}>
+        <label style={formStyles.label}>Colonia:</label>
+        <input
+          type="text"
+          name="colonia"
+          value={formData.colonia}
+          onChange={handleChange}
+          placeholder="Colonia"
+          style={formStyles.input}
+          required
+        />
       </div>
-      <div>
-        <label>
-          Código postal:
-          <input
-            type="text"
-            name="postalCode"
-            value={formData.postalCode}
-            onChange={handleChange}
-            placeholder="Código postal"
-            required
-          />
-        </label>
+      <div style={formStyles.fieldGroup}>
+        <label style={formStyles.label}>Código postal:</label>
+        <input
+          type="text"
+          name="postalCode"
+          value={formData.postalCode}
+          onChange={handleChange}
+          placeholder="Código postal"
+          style={formStyles.input}
+          required
+        />
       </div>
-      <div>
-        <label>
-          Dimensiones (LxWxH en pulgadas):
-          <select
-            name="dimensions"
-            value={formData.dimensions}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Selecciona una opción</option>
-            <option value="14x14x14">14x14x14</option>
-            <option value="16x16x16">16x16x16</option>
-            <option value="18x18x18">18x18x18</option>
-            <option value="20x20x20">20x20x20</option>
-            <option value="18x18x27">18x18x27</option>
-            <option value="22x22x22">22x22x22</option>
-            <option value="24x24x24">24x24x24</option>
-            <option value="24x24x30">24x24x30</option>
-            <option value="27x27x27">27x27x27</option>
-            <option value="30x30x30">30x30x30</option>
-            <option value="otro">Otro</option>
-          </select>
-        </label>
+      <div style={formStyles.fieldGroup}>
+        <label style={formStyles.label}>Dimensiones (LxWxH en pulgadas):</label>
+        <select
+          name="dimensions"
+          value={formData.dimensions}
+          onChange={handleChange}
+          style={formStyles.select}
+          required
+        >
+          <option value="">Selecciona una opción</option>
+          <option value="14x14x14">14x14x14</option>
+          <option value="16x16x16">16x16x16</option>
+          <option value="18x18x18">18x18x18</option>
+          <option value="20x20x20">20x20x20</option>
+          <option value="18x18x27">18x18x27</option>
+          <option value="22x22x22">22x22x22</option>
+          <option value="24x24x24">24x24x24</option>
+          <option value="24x24x30">24x24x30</option>
+          <option value="27x27x27">27x27x27</option>
+          <option value="30x30x30">30x30x30</option>
+          <option value="otro">Otro</option>
+        </select>
         {formData.dimensions === "otro" && (
           <input
             type="text"
@@ -359,53 +411,45 @@ const PackageForm = ({ onGenerateLabel }) => {
             value={formData.customDimensions}
             onChange={handleChange}
             placeholder="Ejemplo: 25x25x25"
-            style={{ marginTop: "5px" }}
+            style={{...formStyles.input, marginTop: "8px"}}
             required
           />
         )}
       </div>
-      <div>
-        <label>
-          Peso (lb):
-          <input
-            type="number"
-            name="weight"
-            value={formData.weight}
-            onChange={handleChange}
-            placeholder="Peso en libras"
-            required
-          />
-        </label>
+      <div style={formStyles.fieldGroup}>
+        <label style={formStyles.label}>Peso (lb):</label>
+        <input
+          type="number"
+          name="weight"
+          value={formData.weight}
+          onChange={handleChange}
+          placeholder="Peso en libras"
+          style={formStyles.input}
+          required
+        />
       </div>
-      <div>
-        <label>
-          Cantidad:
-          <input
-            type="number"
-            name="quantity"
-            value={formData.quantity}
-            onChange={handleChange}
-            placeholder="Cantidad de paquetes"
-            required
-          />
-        </label>
+      <div style={formStyles.fieldGroup}>
+        <label style={formStyles.label}>Cantidad:</label>
+        <input
+          type="number"
+          name="quantity"
+          value={formData.quantity}
+          onChange={handleChange}
+          placeholder="Cantidad de paquetes"
+          style={formStyles.input}
+          required
+        />
       </div>
       <button
         type="submit"
-        style={{
-          marginTop: "10px",
-          backgroundColor: "#014235",
-          color: "#fff",
-          border: "none",
-          padding: "10px 20px",
-          borderRadius: "4px",
-          cursor: "pointer",
-        }}
+        style={formStyles.button}
         disabled={isSubmitting}
       >
         {isSubmitting ? "Enviando..." : "Generar Etiqueta"}
       </button>
-      {statusMessage && <p>{statusMessage}</p>}
+      {statusMessage && (
+        <p style={formStyles.statusMessage}>{statusMessage}</p>
+      )}
     </form>
   );
 };
