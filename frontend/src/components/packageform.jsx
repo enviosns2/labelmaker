@@ -400,13 +400,14 @@ const PackageForm = ({ onGenerateLabel }) => {
           <option value="14x14x14">14x14x14</option>
           <option value="16x16x16">16x16x16</option>
           <option value="18x18x18">18x18x18</option>
-          <option value="20x20x20">20x20x20</option>
           <option value="18x18x27">18x18x27</option>
+          <option value="20x20x20">20x20x20</option>
           <option value="22x22x22">22x22x22</option>
           <option value="24x24x24">24x24x24</option>
           <option value="24x24x30">24x24x30</option>
           <option value="27x27x27">27x27x27</option>
           <option value="30x30x30">30x30x30</option>
+          <option value="28x28x34">28x28x34</option>
           <option value="otro">Otro</option>
         </select>
         {formData.dimensions === "otro" && (
