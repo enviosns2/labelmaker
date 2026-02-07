@@ -53,35 +53,92 @@ const PackageLabel = ({ packageData }) => {
   const handleGeneratePDF = () => {
     const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
     const pageWidth = doc.internal.pageSize.getWidth();
-    let yPosition = 30;
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 15;
+    const contentWidth = pageWidth - margin * 2;
 
+    let yPosition = margin;
+
+    // Título
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(16);
+    doc.setFontSize(18);
+    doc.setTextColor(44, 62, 80); // #2c3e50
     doc.text("ETIQUETA OFICIAL", pageWidth / 2, yPosition, { align: "center" });
-    yPosition += 15;
+    yPosition += 12;
 
-    fields.forEach(({ label, value }) => {
+    // Línea separadora
+    doc.setDrawColor(224, 224, 224); // #e0e0e0
+    doc.line(margin, yPosition, pageWidth - margin, yPosition);
+    yPosition += 8;
+
+    // Campos
+    doc.setFontSize(10);
+    fields.slice(0, -1).forEach(({ label, value }) => {
       if (typeof value === "string" || typeof value === "number") {
-        doc.setFontSize(12);
-        doc.text(
-          `${label}: ${String(value).toUpperCase()}`,
-          pageWidth / 2,
-          yPosition,
-          { align: "center" }
-        );
-        yPosition += 10;
+        // Label en rojo
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(217, 83, 79); // #d9534f
+        doc.text(`${label}:`, margin, yPosition);
+
+        // Valor en gris oscuro
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(44, 62, 80); // #2c3e50
+        const valueText = String(value).toUpperCase();
+        const valueHeight = doc.getTextDimensions(valueText, { maxWidth: contentWidth - 80 }).h;
+        doc.text(valueText, margin + 80, yPosition, { maxWidth: contentWidth - 80 });
+
+        yPosition += Math.max(7, valueHeight + 2);
       }
     });
 
+    // Línea separadora antes del código
+    yPosition += 3;
+    doc.setDrawColor(224, 224, 224);
+    doc.line(margin, yPosition, pageWidth - margin, yPosition);
+    yPosition += 8;
+
+    // Código único - sección especial
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.setTextColor(217, 83, 79); // #d9534f
+    doc.text("IDENTIFICADOR ÚNICO", pageWidth / 2, yPosition, { align: "center" });
+    yPosition += 8;
+
+    // Código con fondo
+    doc.setFillColor(245, 245, 245); // #f5f5f5
+    doc.rect(margin + 10, yPosition, contentWidth - 20, 10, "F");
+    doc.setFont("courier", "bold");
+    doc.setFontSize(11);
+    doc.setTextColor(44, 62, 80);
+    doc.text(uniqueCode, pageWidth / 2, yPosition + 6, { align: "center" });
+    yPosition += 15;
+
+    // Código de barras
     try {
       const barcodeImage = barcodeCanvasRef.current.toDataURL("image/png");
-      doc.addImage(barcodeImage, "PNG", pageWidth / 2 - 50, yPosition + 10, 100, 30);
+      const barcodeWidth = 80;
+      const barcodeHeight = 40;
+      doc.addImage(
+        barcodeImage,
+        "PNG",
+        pageWidth / 2 - barcodeWidth / 2,
+        yPosition,
+        barcodeWidth,
+        barcodeHeight
+      );
+      yPosition += barcodeHeight + 5;
     } catch (error) {
       console.error("Error agregando código de barras al PDF:", error);
     }
 
     const timestamp = new Date()
-      .toLocaleString("es-MX", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })
+      .toLocaleString("es-MX", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
       .replace(/[/:,]/g, "-");
     doc.save(`${uniqueCode}-${timestamp}.pdf`);
   };
@@ -173,16 +230,15 @@ const PackageLabel = ({ packageData }) => {
       fontWeight: 700,
       color: "#d9534f",
       marginRight: "8px",
-      display: "inline-block",
-      minWidth: "150px",
+      display: "block",
     },
     fieldValue: {
       color: "#2c3e50",
       wordBreak: "break-word",
-      whiteSpace: "pre-line",
+      whiteSpace: "pre-wrap",
       fontWeight: "500",
-      display: "inline-block",
-      maxWidth: "calc(100% - 160px)",
+      display: "block",
+      marginTop: "4px",
     },
     fieldItem: {
       margin: "12px 0",
