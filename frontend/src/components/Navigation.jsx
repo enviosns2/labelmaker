@@ -4,8 +4,8 @@ const Navigation = ({ activeTab, onTabChange, hasPackageData }) => {
   const navStyles = {
     nav: {
       display: "flex",
-      backgroundColor: "#000000",
-      borderBottom: "3px solid #014235",
+      backgroundColor: "#2c3e50",
+      borderBottom: "3px solid #27ae60",
       marginBottom: "1rem",
       gap: "0.25rem",
       padding: "0.5rem",
@@ -17,13 +17,13 @@ const Navigation = ({ activeTab, onTabChange, hasPackageData }) => {
     tab: {
       padding: "0.75rem 1.25rem",
       border: "none",
-      backgroundColor: "#333333",
+      backgroundColor: "rgba(255,255,255,0.1)",
       color: "white",
       cursor: "pointer",
       fontSize: "1rem",
-      fontWeight: "600",
+      fontWeight: "700",
       whiteSpace: "nowrap",
-      borderRadius: "4px 4px 0 0",
+      borderRadius: "0",
       transition: "all 0.3s ease",
       minWidth: "fit-content",
       minHeight: "44px",
@@ -33,10 +33,10 @@ const Navigation = ({ activeTab, onTabChange, hasPackageData }) => {
       borderBottom: "3px solid transparent",
     },
     tabActive: {
-      backgroundColor: "#014235",
+      backgroundColor: "#27ae60",
       color: "white",
-      borderBottom: "3px solid #fff",
-      boxShadow: "0 -2px 4px rgba(0,0,0,0.2)",
+      borderBottom: "3px solid #27ae60",
+      boxShadow: "inset 0 -3px 0 rgba(0,0,0,0.1)",
     },
     tabDisabled: {
       opacity: "0.5",

@@ -75,15 +75,17 @@ const styles = {
     flexDirection: "column",
   },
   header: {
-    backgroundColor: "#000000",
+    backgroundColor: "#2c3e50",
     color: "white",
-    padding: "1rem",
+    padding: "1.5rem 1rem",
     textAlign: "center",
-    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
   },
   headerText: {
     margin: 0,
     fontSize: "1.8rem",
+    fontWeight: "600",
+    letterSpacing: "0.5px",
   },
   main: {
     display: "flex",

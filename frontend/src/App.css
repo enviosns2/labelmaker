@@ -246,11 +246,18 @@ select {
 }
 
 button {
-  background-color: black;
+  background-color: #27ae60;
   color: white;
   border: none;
   cursor: pointer;
   padding: 10px;
+  font-weight: 700;
+  transition: all 0.3s ease;
+}
+
+button:hover:not(:disabled) {
+  background-color: #229954;
+  transform: translateY(-1px);
 }
 
 /* Logo */

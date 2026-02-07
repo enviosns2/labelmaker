@@ -153,68 +153,87 @@ const PackageLabel = ({ packageData }) => {
     title: {
       textAlign: "center",
       color: "#2c3e50",
-      fontSize: "1.3rem",
-      marginBottom: "1rem",
-      fontWeight: "bold",
-      margin: "0 0 1rem 0",
+      fontSize: "1.5rem",
+      marginBottom: "1.5rem",
+      fontWeight: "700",
+      margin: "0 0 1.5rem 0",
+      letterSpacing: "0.5px",
     },
     labelBox: {
-      backgroundColor: "#f8f9fa",
-      padding: "1.25rem",
-      borderRadius: "8px",
+      backgroundColor: "#ffffff",
+      padding: "1.5rem",
+      borderRadius: "4px",
       maxWidth: "100%",
       boxSizing: "border-box",
       width: "100%",
+      border: "1px solid #e0e0e0",
+      boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
     },
     fieldLabel: {
-      fontWeight: "bold",
-      color: "#333",
-      marginRight: "0.5rem",
+      fontWeight: 700,
+      color: "#d9534f",
+      marginRight: "8px",
+      display: "inline-block",
+      minWidth: "150px",
     },
     fieldValue: {
-      color: "#666",
+      color: "#2c3e50",
       wordBreak: "break-word",
       whiteSpace: "pre-line",
+      fontWeight: "500",
+      display: "inline-block",
+      maxWidth: "calc(100% - 160px)",
     },
     fieldItem: {
-      margin: "10px 0",
+      margin: "12px 0",
       fontSize: "0.95rem",
-      lineHeight: "1.4",
+      lineHeight: "1.6",
       wordBreak: "break-word",
+      borderBottom: "1px solid #f0f0f0",
+      paddingBottom: "10px",
+    },
+    fieldItemLast: {
+      borderBottom: "none",
     },
     barcodeSection: {
       margin: "20px 0 0 0",
       textAlign: "center",
       paddingTop: "15px",
-      borderTop: "1px solid #ddd",
+      borderTop: "2px solid #f0f0f0",
     },
     barcodeSectionTitle: {
-      fontWeight: "bold",
+      fontWeight: 700,
       marginBottom: "10px",
-      fontSize: "0.9rem",
-      margin: "0 0 10px 0",
+      fontSize: "0.95rem",
+      margin: "0 0 15px 0",
+      color: "#d9534f",
+      textTransform: "uppercase",
+      letterSpacing: "0.5px",
     },
     barcodeCode: {
-      fontSize: "1.1rem",
-      letterSpacing: "2px",
-      margin: "10px 0",
-      fontFamily: "monospace",
-      padding: "10px",
-      backgroundColor: "#fff",
+      fontSize: "1rem",
+      letterSpacing: "3px",
+      margin: "12px 0",
+      fontFamily: "'Courier New', monospace",
+      padding: "12px",
+      backgroundColor: "#f9f9f9",
       borderRadius: "4px",
       border: "1px solid #ddd",
       wordBreak: "break-all",
+      fontWeight: "600",
+      color: "#2c3e50",
     },
     barcodeCanvas: {
       maxWidth: "100%",
       height: "auto",
       display: "block",
+      margin: "10px auto",
     },
     buttonContainer: {
       display: "flex",
-      gap: "10px",
+      gap: "12px",
       justifyContent: "center",
-      marginTop: "15px",
+      marginTop: "20px",
       flexWrap: "wrap",
       padding: "0 1rem",
       boxSizing: "border-box",
@@ -223,14 +242,16 @@ const PackageLabel = ({ packageData }) => {
       padding: "12px 20px",
       color: "white",
       border: "none",
-      borderRadius: "6px",
+      borderRadius: "4px",
       cursor: "pointer",
       fontSize: "0.95rem",
-      fontWeight: "600",
+      fontWeight: "700",
       minHeight: "44px",
       minWidth: "44px",
       transition: "all 0.3s ease",
-      flex: "1 1 calc(50% - 5px)",
+      flex: "1 1 calc(50% - 6px)",
+      textTransform: "uppercase",
+      letterSpacing: "0.5px",
     },
     pdfButton: {
       backgroundColor: "#3498db",
@@ -245,17 +266,20 @@ const PackageLabel = ({ packageData }) => {
       <div id="print-label" style={labelStyles.labelBox}>
         <h2 style={labelStyles.title}>Etiqueta Oficial</h2>
         <div>
-          {fields.map(({ label, value }) => (
+          {fields.map(({ label, value }, index) => (
             <p
               key={label}
-              style={labelStyles.fieldItem}
+              style={{
+                ...labelStyles.fieldItem,
+                ...(index === fields.length - 1 ? labelStyles.fieldItemLast : {}),
+              }}
             >
               <span style={labelStyles.fieldLabel}>{label}:</span>
-              <span style={labelStyles.fieldValue}> {typeof value === "string" ? value : value}</span>
+              <span style={labelStyles.fieldValue}>{typeof value === "string" ? value : value}</span>
             </p>
           ))}
           <div style={labelStyles.barcodeSection}>
-            <p style={labelStyles.barcodeSectionTitle}>Identificador único:</p>
+            <p style={labelStyles.barcodeSectionTitle}>Identificador único</p>
             <div style={labelStyles.barcodeCode}>{uniqueCode}</div>
             <canvas ref={barcodeCanvasRef} style={labelStyles.barcodeCanvas}></canvas>
           </div>
