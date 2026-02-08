@@ -223,6 +223,7 @@ const PackageForm = ({ onGenerateLabel }) => {
       borderRadius: "6px",
       boxSizing: "border-box",
       backgroundColor: "white",
+      color: "black",
       transition: "border-color 0.3s ease",
     },
     button: {
