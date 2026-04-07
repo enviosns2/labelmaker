@@ -54,25 +54,25 @@ const PackageLabel = ({ packageData }) => {
     const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
-    const margin = 15;
+    const margin = 8;
     const contentWidth = pageWidth - margin * 2;
 
     let yPosition = margin;
 
-    // Título (+25% tamaño)
+    // Título (maximizado)
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(23);
+    doc.setFontSize(30);
     doc.setTextColor(44, 62, 80); // #2c3e50
     doc.text("ETIQUETA OFICIAL", pageWidth / 2, yPosition, { align: "center" });
-    yPosition += 15;
+    yPosition += 18;
 
     // Línea separadora
     doc.setDrawColor(224, 224, 224); // #e0e0e0
     doc.line(margin, yPosition, pageWidth - margin, yPosition);
-    yPosition += 10;
+    yPosition += 12;
 
-    // Campos (+25% tamaño)
-    doc.setFontSize(13);
+    // Campos (maximizado)
+    doc.setFontSize(17);
     fields.slice(0, -1).forEach(({ label, value }) => {
       if (typeof value === "string" || typeof value === "number") {
         // Label en rojo
@@ -87,37 +87,37 @@ const PackageLabel = ({ packageData }) => {
         const valueHeight = doc.getTextDimensions(valueText, { maxWidth: contentWidth - 80 }).h;
         doc.text(valueText, margin + 80, yPosition, { maxWidth: contentWidth - 80 });
 
-        yPosition += Math.max(9, valueHeight + 3);
+        yPosition += Math.max(11, valueHeight + 4);
       }
     });
 
     // Línea separadora antes del código
-    yPosition += 4;
+    yPosition += 5;
     doc.setDrawColor(224, 224, 224);
     doc.line(margin, yPosition, pageWidth - margin, yPosition);
-    yPosition += 10;
+    yPosition += 12;
 
-    // Código único - sección especial (+25% tamaño)
+    // Código único - sección especial (maximizado)
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(13);
+    doc.setFontSize(17);
     doc.setTextColor(217, 83, 79); // #d9534f
     doc.text("IDENTIFICADOR ÚNICO", pageWidth / 2, yPosition, { align: "center" });
-    yPosition += 10;
+    yPosition += 12;
 
-    // Código con fondo (+25% tamaño)
+    // Código con fondo (maximizado)
     doc.setFillColor(245, 245, 245); // #f5f5f5
-    doc.rect(margin + 10, yPosition, contentWidth - 20, 13, "F");
+    doc.rect(margin + 10, yPosition, contentWidth - 20, 16, "F");
     doc.setFont("courier", "bold");
-    doc.setFontSize(14);
+    doc.setFontSize(18);
     doc.setTextColor(44, 62, 80);
-    doc.text(uniqueCode, pageWidth / 2, yPosition + 8, { align: "center" });
-    yPosition += 19;
+    doc.text(uniqueCode, pageWidth / 2, yPosition + 9, { align: "center" });
+    yPosition += 22;
 
-    // Código de barras
+    // Código de barras (aumentado)
     try {
       const barcodeImage = barcodeCanvasRef.current.toDataURL("image/png");
-      const barcodeWidth = 80;
-      const barcodeHeight = 40;
+      const barcodeWidth = 100;
+      const barcodeHeight = 50;
       doc.addImage(
         barcodeImage,
         "PNG",
@@ -126,7 +126,7 @@ const PackageLabel = ({ packageData }) => {
         barcodeWidth,
         barcodeHeight
       );
-      yPosition += barcodeHeight + 5;
+      yPosition += barcodeHeight + 8;
     } catch (error) {
       console.error("Error agregando código de barras al PDF:", error);
     }
