@@ -54,10 +54,12 @@ const PackageLabel = ({ packageData }) => {
     const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
-    const margin = 8;
-    const contentWidth = pageWidth - margin * 2;
+    const marginSides = 8;
+    const marginTop = 16;
+    const marginBottom = 8;
+    const contentWidth = pageWidth - marginSides * 2;
 
-    let yPosition = margin;
+    let yPosition = marginTop;
 
     // Título (maximizado)
     doc.setFont("helvetica", "bold");
@@ -68,7 +70,7 @@ const PackageLabel = ({ packageData }) => {
 
     // Línea separadora
     doc.setDrawColor(224, 224, 224); // #e0e0e0
-    doc.line(margin, yPosition, pageWidth - margin, yPosition);
+    doc.line(marginSides, yPosition, pageWidth - marginSides, yPosition);
     yPosition += 12;
 
     // Campos (maximizado)
@@ -78,14 +80,14 @@ const PackageLabel = ({ packageData }) => {
         // Label en rojo
         doc.setFont("helvetica", "bold");
         doc.setTextColor(217, 83, 79); // #d9534f
-        doc.text(`${label}:`, margin, yPosition);
+        doc.text(`${label}:`, marginSides, yPosition);
 
         // Valor en gris oscuro
         doc.setFont("helvetica", "normal");
         doc.setTextColor(44, 62, 80); // #2c3e50
         const valueText = String(value).toUpperCase();
         const valueHeight = doc.getTextDimensions(valueText, { maxWidth: contentWidth - 80 }).h;
-        doc.text(valueText, margin + 80, yPosition, { maxWidth: contentWidth - 80 });
+        doc.text(valueText, marginSides + 80, yPosition, { maxWidth: contentWidth - 80 });
 
         yPosition += Math.max(11, valueHeight + 4);
       }
@@ -94,7 +96,7 @@ const PackageLabel = ({ packageData }) => {
     // Línea separadora antes del código
     yPosition += 5;
     doc.setDrawColor(224, 224, 224);
-    doc.line(margin, yPosition, pageWidth - margin, yPosition);
+    doc.line(marginSides, yPosition, pageWidth - marginSides, yPosition);
     yPosition += 12;
 
     // Código único - sección especial (maximizado)
@@ -106,7 +108,7 @@ const PackageLabel = ({ packageData }) => {
 
     // Código con fondo (maximizado)
     doc.setFillColor(245, 245, 245); // #f5f5f5
-    doc.rect(margin + 10, yPosition, contentWidth - 20, 16, "F");
+    doc.rect(marginSides + 10, yPosition, contentWidth - 20, 16, "F");
     doc.setFont("courier", "bold");
     doc.setFontSize(18);
     doc.setTextColor(44, 62, 80);
