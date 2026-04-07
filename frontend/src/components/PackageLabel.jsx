@@ -59,20 +59,20 @@ const PackageLabel = ({ packageData }) => {
 
     let yPosition = margin;
 
-    // Título
+    // Título (+25% tamaño)
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(18);
+    doc.setFontSize(23);
     doc.setTextColor(44, 62, 80); // #2c3e50
     doc.text("ETIQUETA OFICIAL", pageWidth / 2, yPosition, { align: "center" });
-    yPosition += 12;
+    yPosition += 15;
 
     // Línea separadora
     doc.setDrawColor(224, 224, 224); // #e0e0e0
     doc.line(margin, yPosition, pageWidth - margin, yPosition);
-    yPosition += 8;
+    yPosition += 10;
 
-    // Campos
-    doc.setFontSize(10);
+    // Campos (+25% tamaño)
+    doc.setFontSize(13);
     fields.slice(0, -1).forEach(({ label, value }) => {
       if (typeof value === "string" || typeof value === "number") {
         // Label en rojo
@@ -87,31 +87,31 @@ const PackageLabel = ({ packageData }) => {
         const valueHeight = doc.getTextDimensions(valueText, { maxWidth: contentWidth - 80 }).h;
         doc.text(valueText, margin + 80, yPosition, { maxWidth: contentWidth - 80 });
 
-        yPosition += Math.max(7, valueHeight + 2);
+        yPosition += Math.max(9, valueHeight + 3);
       }
     });
 
     // Línea separadora antes del código
-    yPosition += 3;
+    yPosition += 4;
     doc.setDrawColor(224, 224, 224);
     doc.line(margin, yPosition, pageWidth - margin, yPosition);
-    yPosition += 8;
+    yPosition += 10;
 
-    // Código único - sección especial
+    // Código único - sección especial (+25% tamaño)
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(10);
+    doc.setFontSize(13);
     doc.setTextColor(217, 83, 79); // #d9534f
     doc.text("IDENTIFICADOR ÚNICO", pageWidth / 2, yPosition, { align: "center" });
-    yPosition += 8;
+    yPosition += 10;
 
-    // Código con fondo
+    // Código con fondo (+25% tamaño)
     doc.setFillColor(245, 245, 245); // #f5f5f5
-    doc.rect(margin + 10, yPosition, contentWidth - 20, 10, "F");
+    doc.rect(margin + 10, yPosition, contentWidth - 20, 13, "F");
     doc.setFont("courier", "bold");
-    doc.setFontSize(11);
+    doc.setFontSize(14);
     doc.setTextColor(44, 62, 80);
-    doc.text(uniqueCode, pageWidth / 2, yPosition + 6, { align: "center" });
-    yPosition += 15;
+    doc.text(uniqueCode, pageWidth / 2, yPosition + 8, { align: "center" });
+    yPosition += 19;
 
     // Código de barras
     try {
